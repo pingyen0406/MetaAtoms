@@ -1,4 +1,4 @@
-function phi = PropCorrect(period,neff,wavelength)
+function phi = PropCorrect(N,period,neff,wavelength)
 % Correcting the desire phase list by taking propagation phase into
 % consideration.
 % Input:
@@ -7,7 +7,6 @@ function phi = PropCorrect(period,neff,wavelength)
 % wavelength: operating wavelength
 % Output:
 % phi: phase profile of the propagating wave(normalized,between[0,1])
-N = length(Phase);
 phi = zeros(1,N);
 for i=1:N
     phi(1,i)=(i-1)*period*neff/wavelength;    
