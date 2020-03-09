@@ -3,7 +3,7 @@ function field=Eatom(Phase,T,atom_pos,x_range,z_range,y,x_res,z_res,lambda)
 % meta-atoms are design on x-axis
 % Unit in "micron".
 % E = (1/r)*A*exp(i*k*r)*exp(i*starting phase)
-% Phase: starting phase, and should be 1D array.
+% Phase: starting phase at z=0, and should be 1D array.
 % atom_pos: x,y position array of meta-atoms, which should be 2D array.
 % T : transmission = amplitude, and should be 1D array.
 % x_range & z_range = [xmin,xmax]

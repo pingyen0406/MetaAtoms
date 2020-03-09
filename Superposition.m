@@ -1,10 +1,10 @@
 clear all;clc;
 % For Linux path
-folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtom/60nmAl2O3/';
-addpath("/home/pingyen/Simulation/MATLAB/MetaAtom/");
+%folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/';
+%addpath("/home/pingyen/Simulation/MATLAB/Lib562/MetaAtoms/");
 % For Windows path
-%folder_path = 'D:/Dropbox/MATLAB/MetaAtom/60nmAl2O3/TopAl2O3/';
-
+folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/TopAl2O3/';
+addpath("D:/Dropbox/MATLAB/MetaAtoms/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
 outputlist = false;
@@ -21,7 +21,8 @@ R_list = [0.03:0.002:0.248];
 % Parameters
 lattice = 0.562;
 f = 46.8; % focal length
-N = 100;% number of meta-atoms
+N = 100; % number of meta-atoms
+neff = 2.858; % effective index derived from FDTD
 atomPos = zeros(2,N);
 % crate x-position array of meta-atoms
 for i=1:N
@@ -48,19 +49,14 @@ Phase=NorPhase(Phase);
 Phase = Truncated_Phase(Phase,32,79);
 T = T(1,32:79);
 R_list = R_list(1,32:79);
-[sphericalList,Dphase] = SphericalOutput(Phase,T,R_list,f,lattice,N,1.55);
-amp_list = zeros(1,N);
-for i=1:N
-    if isnan(interp1(R_list,T,sphericalList(i)))==1
-        amp_list(1,i)=0;
-    else
-        amp_list(1,i) = interp1(R_list,T,sphericalList(i))*(1-(0.6/100)*i);
-    end
-end
-plot(amp_list);
+Dphase = PropCorrect(period,neff,wavelength);
+Dphase = NorPhase(Dphase);
+Dphase = SphericalOutput(Dphase,f,lattice,N,1.55);
+[R_list,T_list]=Interpolation(Dpahse,T,R_list);
+plot(T_list);
 hold on
 if plot_field==true
-    Field=Eatom(Dphase,amp_list,atomPos,[0,60],[1,61],0,600,600,1.55);
+    Field=Eatom(Dphase,T_list,atomPos,[0,60],[1,61],0,600,600,1.55);
 end
 
 % Output List
