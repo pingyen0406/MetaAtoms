@@ -1,14 +1,14 @@
 clear all;clc;
 % For Linux path
-folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib542/60nmAl2O3/';
 addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/");
 % For Windows path
 %folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/TopAl2O3/';
 %addpath("D:/Dropbox/MATLAB/MetaAtoms/");
-fname_T = [folder_path,'SweepT562.txt'];
-fname_Phase = [folder_path,'SweepPhase562.txt'];
+fname_T = [folder_path,'SweepT542.txt'];
+fname_Phase = [folder_path,'SweepPhase542.txt'];
 outputlist = true;
-outputname = [folder_path,'spherical1200.txt'];
+outputname = [folder_path,'spherical1200_prop.txt'];
 plot_field = true;
 % Read data from S4
 % (i,j) is 500+10*i nm height and 100+1*j nm radius
@@ -56,12 +56,7 @@ R_list = R_list(1,start_index:stop_index);
 Dphase = SphericalOutput(0,f,lattice,N,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 % Simulating energy decay below the waveguide
-%{
-alpha = 0.5;% decay rate 
-for i=1:N
-    T_list(1,i)=(1-alpha*i/N)*T_list(1,i);
-end
-%}
+% 
 % plot(T_list);
 if plot_field==true
     Field=Eatom(Dphase,T_list,atomPos,[0,60],[1,61],0,600,600,1.55);

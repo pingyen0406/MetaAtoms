@@ -16,9 +16,9 @@ function Dphase=SphericalOutput(Phase,f,lattice,N,lambda)
 
 % Calculate the desired phase profile.
 if Phase==0
-    Dphase = Phase;
-else
     Dphase = zeros(1,N);
+else
+    Dphase = Phase;
 end
 
 for i=1:N
