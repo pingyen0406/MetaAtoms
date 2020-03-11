@@ -49,9 +49,9 @@ Phase=NorPhase(Phase);
 Phase = Truncated_Phase(Phase,32,79);
 T = T(1,32:79);
 R_list = R_list(1,32:79);
-Dphase = PropCorrect(period,neff,wavelength);
-Dphase = NorPhase(Dphase);
-Dphase = SphericalOutput(Dphase,f,lattice,N,1.55);
+delay_phase = PropCorrect(period,neff,wavelength);
+delay_phase = NorPhase(delay_phase);
+Dphase = 1dSpherical(delay_phase,f,lattice,N,1.55);
 [R_list,T_list]=Interpolation(Dpahse,T,R_list);
 plot(T_list);
 hold on
