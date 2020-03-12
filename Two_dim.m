@@ -7,7 +7,7 @@ folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
 addpath("D:/Dropbox/MATLAB/MetaAtoms/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
-outputlist = true;
+outputlist = false;
 outputname = [folder_path,'spherical1200.txt'];
 plot_field = true;
 
@@ -21,28 +21,26 @@ Phase = all_Phase(height/10-50+1,:);
 R_list = [0.03:0.002:0.248];
 
 % Parameters
-lattice = 0.562;
+period = 0.562;
 f = 46.8; % focal length
-radius = 50;
-N = floor(2*radius/lattice); % number of meta-atoms
+lens_radius = 50;
+N = floor(2*lens_radius/period); % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 tmpPos = cell(N);
-atomPos = zeros(2,N^2);
-% crate position array of meta-atoms
-for i=1:N
-    for j=1:N
-        if (lattice*(i-1-N/2))^2+(lattice*(j-1-N/2))^2 < radius^2
-            tmpPos{j,i}=[lattice*(i-1),lattice*(j-1)];
-            atomPos(1,i*j)=lattice*(i-1);
-            atomPos(2,i*j)=lattice*(j-1);
+atomPos = zeros(2,1);
+% crate a circular shape array of meta-atoms
+for i=1:floor(N/2)
+    for j=1:floor(N/2)
+        if (period*i)^2+(period*j)^2 < lens_radius^2
+            atomPos=cat(2,atomPos,[period*i;period*j]);
         else
             continue
-        end
+        end               
     end
 end 
-atomPos = reshape(find(atomPos,
-
+atomPos=cat(2,atomPos,bsxfun(@times,atomPos,[-1;1]));
+atomPos=cat(2,atomPos,bsxfun(@times,atomPos,[1;-1]));
     
 
 % Choosing desired part of phase data
@@ -55,11 +53,12 @@ T = T(1,start_index:stop_index);
 R_list = R_list(1,start_index:stop_index);
 
 % Taking propagation phase into consideration 
+
 %delay_phase = PropCorrect(N,lattice,neff,wavelength);
 %delay_phase = NorPhase(delay_phase);
 
 % Creating focusing phase profile and doing interpolation
-Dphase = SphericalOutput(0,f,lattice,N,1.55);
+Dphase = SphericalOutput(0,f,[0,0],atomPos,N,1.55);
 [R_list,T_list]=Interpolation(delay_phase,Phase,T,R_list);
 
 % Simulating energy decay below the waveguide
@@ -72,7 +71,7 @@ end
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
-    Field=Focal_Slice(Dphase,T_list,atomPos,[0,60],[1,61],46.8,600,600,1.55);
+    Field=Focal_Slice(Dphase,T_list,atomPos,[-60,60],[-60,60],46.8,600,600,1.55);
 end
 
 % Output List
