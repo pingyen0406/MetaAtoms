@@ -1,10 +1,10 @@
 clear all;clc;
 % For Linux path
-%folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-%addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
+folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
 % For Windows path
-folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
+%folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+%addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
 outputlist = false;
@@ -22,8 +22,8 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-f = 46.8; % focal length
-lens_radius = 50;
+f = 100; % focal length
+lens_radius = 12;
 N = floor(2*lens_radius/period); % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
@@ -71,7 +71,7 @@ end
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
-    Field=Focal_Slice(Dphase,T_list,atomPos,[-60,60],[-60,60],46.8,600,600,1.55);
+    Field=Focal_Slice(Dphase,T_list,atomPos,[-20,20],[-20,20],100,200,200,1.55);
 end
 
 % Output List
