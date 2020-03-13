@@ -18,30 +18,24 @@ field = zeros(0,0,0);
 for i= 1:length(x_list)
     for j=1:length(y_list)
         for k=1:length(atom_pos)
-            tmp=(x_list(i)-atom_pos(1,k))^2+(y_list(1,j)-atom_pos(2,k))^2+z^2;
-            r_list(i,j,k)=sqrt(tmp);
-        end
-    end
-end
-prop_phase = r_list/lambda;
-for i=1:length(x_list)
-    for j=1:length(y_list)
-        for k=1:length(T)
-            field(i,j,k) = (1/r_list(i,j,k))*T(k)*...
-                exp(1i*2*pi*prop_phase(i,j,k))*exp(1i*2*pi*Phase(k));
+            tmp_rr=(x_list(i)-atom_pos(1,k))^2+(y_list(1,j)...
+                -atom_pos(2,k))^2+z^2;
+            tmp_phase=sqrt(tmp_rr)/lambda;    
+            field(i,j,k) = (1/sqrt(tmp_rr))*T(k)*...
+                exp(1i*2*pi*tmp_phase)*exp(1i*2*pi*Phase(k));
         end
     end
 end
 field = sum(field,3);
-figure(1);
+figure;
 colormap('jet');
 image(y_list,x_list,real(field),'CDataMapping','scaled');
 title(['real part at z=',num2str(z),'um']);
-figure(2);
+figure;
 colormap('jet');
 image(y_list,x_list,imag(field),'CDataMapping','scaled');
 title(['imag part at z=',num2str(z),'um']);
-figure(3);
+figure;
 colormap('jet');
 image(y_list,x_list,abs(field),'CDataMapping','scaled');
 title(['Absolute value at z=',num2str(z),'um']);

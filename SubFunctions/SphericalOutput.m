@@ -24,11 +24,10 @@ end
 x=mid_point(1);
 y=mid_point(2);
 for i=1:length(atom_pos)
-    r_square = ((atom_pos(1,i)-x)^2+(atom_pos(2,i)-y))^2;
+    r_square = (atom_pos(1,i)-x)^2+(atom_pos(2,i)-y)^2;
     Dphase(1,i) = Dphase(1,i)-(sqrt(r_square+f^2)-f)/lambda;
     while Dphase(1,i)<-1
         Dphase(1,i)=Dphase(1,i)+1;
     end
 end
-
 end

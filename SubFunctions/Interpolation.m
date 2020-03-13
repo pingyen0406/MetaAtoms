@@ -25,7 +25,7 @@ for i=1:N
     if isnan(interp1(R,T,R_list(1,i)))==1
         T_list(1,i)=0;
     else
-        T_list(1,i) = interp1(R,T,R_list(1,i))*(1);
+        T_list(1,i) = interp1(R,T,R_list(1,i));
     end
 end
 end

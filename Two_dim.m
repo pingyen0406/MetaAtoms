@@ -1,10 +1,10 @@
 clear all;clc;
 % For Linux path
-folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
+%folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+%addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
 % For Windows path
-%folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-%addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
+folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
 outputlist = false;
@@ -22,32 +22,42 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-f = 100; % focal length
-lens_radius = 12;
+f = 46.8; % focal length
+lens_radius = 12; % radius or length of metalens
 N = floor(2*lens_radius/period); % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 tmpPos = cell(N);
 atomPos = zeros(0,0);
-% crate a circular shape array of meta-atoms
+% creating a circular shape meta-atoms
+%{
 for i=1:N
     for j=1:N
         x_now = period*(i-floor(N/2));
         y_now = period*(j-floor(N/2));
         if x_now^2+y_now^2 < lens_radius^2
+            
             atomPos=cat(2,atomPos,[x_now;y_now]);
         else
             continue
         end               
     end
-end 
-   
+end
+%}
+% creating a square shape metalens   
+for i=1:N
+    for j=1:N
+        x_now = period*(i-floor(N/2));
+        y_now = period*(j-floor(N/2));
+        atomPos=cat(2,atomPos,[x_now;y_now]);                   
+    end
+end
 
 % Choosing desired part of phase data
 Phase=NorPhase(Phase);
 % Set an breakpoint this line to check the phase data.
-start_index=30;
-stop_index=79;
+start_index=1;
+stop_index=77;
 Phase = Truncated_Phase(Phase,start_index,stop_index);
 T = T(1,start_index:stop_index);
 R_list = R_list(1,start_index:stop_index);
@@ -60,7 +70,9 @@ R_list = R_list(1,start_index:stop_index);
 % Creating focusing phase profile and doing interpolation
 Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
-
+surface(reshape(R_list',[N,N]),'CDataMapping','scaled');
+colormap('jet');
+view(3)
 % Simulating energy decay below the waveguide
 %{
 alpha = 0.5;% decay rate 
@@ -71,7 +83,8 @@ end
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
-    Field=Focal_Slice(Dphase,T_list,atomPos,[-20,20],[-20,20],100,200,200,1.55);
+    %focal_field=Focal_Slice(Dphase,T_list,atomPos,[-20,20],[-20,20],100,200,200,1.55);
+    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-20,20],[1,61],0,200,300,1.55);
 end
 
 % Output List
