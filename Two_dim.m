@@ -1,10 +1,10 @@
 clear all;clc;
 % For Linux path
 %folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-%addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/");
+%addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
 % For Windows path
 folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-addpath("D:/Dropbox/MATLAB/MetaAtoms/");
+addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
 outputlist = false;
@@ -28,20 +28,20 @@ N = floor(2*lens_radius/period); % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 tmpPos = cell(N);
-atomPos = zeros(2,1);
+atomPos = zeros(0,0);
 % crate a circular shape array of meta-atoms
-for i=1:floor(N/2)
-    for j=1:floor(N/2)
-        if (period*i)^2+(period*j)^2 < lens_radius^2
-            atomPos=cat(2,atomPos,[period*i;period*j]);
+for i=1:N
+    for j=1:N
+        x_now = period*(i-floor(N/2));
+        y_now = period*(j-floor(N/2));
+        if x_now^2+y_now^2 < lens_radius^2
+            atomPos=cat(2,atomPos,[x_now;y_now]);
         else
             continue
         end               
     end
 end 
-atomPos=cat(2,atomPos,bsxfun(@times,atomPos,[-1;1]));
-atomPos=cat(2,atomPos,bsxfun(@times,atomPos,[1;-1]));
-    
+   
 
 % Choosing desired part of phase data
 Phase=NorPhase(Phase);
@@ -58,8 +58,8 @@ R_list = R_list(1,start_index:stop_index);
 %delay_phase = NorPhase(delay_phase);
 
 % Creating focusing phase profile and doing interpolation
-Dphase = SphericalOutput(0,f,[0,0],atomPos,N,1.55);
-[R_list,T_list]=Interpolation(delay_phase,Phase,T,R_list);
+Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
+[R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 
 % Simulating energy decay below the waveguide
 %{
@@ -83,17 +83,5 @@ if outputlist==true
     fclose(outf);
 end
 
-%---------------------------- Test data-------------------------------
-%{
-test_name = 'perfectAtom.txt';
-test_f = readmatrix(test_name);
-test_r = transpose(test_f(:,1));
-test_T = transpose(test_f(:,2));
-test_Phase = transpose(test_f(:,3));
-[sphericalList,Dphase] = SphericalOutput(test_Phase,test_T,test_r,f,lattice,N,1.55);
-amp_list = interp1(test_r,test_T,sphericalList);
-Field=Eatom(Dphase,amp_list,atomPos,[0,60],[1,20],0,1200,400,1.55);
-%}
-%-----------------------------------------------------------------------
 
 
