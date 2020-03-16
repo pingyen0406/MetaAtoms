@@ -16,5 +16,8 @@ for i=1:length(Phase)
     while Phase(1,i)>0
         Phase(1,i)=Phase(1,i)-1;
     end
+    while Phase(1,i)<-1
+        Phase(1,i)=Phase(1,i)+1;
+    end
 end
 end

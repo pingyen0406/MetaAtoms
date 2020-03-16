@@ -22,13 +22,14 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-f = 46.8; % focal length
-lens_radius = 12; % radius or length of metalens
+f = 30; % focal length
+lens_radius = 15; % radius or length of metalens
 N = floor(2*lens_radius/period); % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 tmpPos = cell(N);
 atomPos = zeros(0,0);
+
 % creating a circular shape meta-atoms
 %{
 for i=1:N
@@ -53,6 +54,20 @@ for i=1:N
     end
 end
 
+%---------------------------- Test data-------------------------------
+
+test_name = 'perfectAtom.txt';
+test_f = readmatrix(test_name);
+test_r = transpose(test_f(:,1));
+test_T = transpose(test_f(:,2));
+test_Phase = NorPhase(transpose(test_f(:,3)));
+test_Phase(1,end)=0;
+Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
+[R_list,T_list]=Interpolation(Dphase,test_Phase,test_T,test_r);
+focal_field=Focal_Slice(Dphase,T_list,atomPos,[-16,16],[-16,16],f,320,320,1.55);
+focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-16,16],[1,41],0,320,400,1.55);
+%-----------------------------------------------------------------------
+
 % Choosing desired part of phase data
 Phase=NorPhase(Phase);
 % Set an breakpoint this line to check the phase data.
@@ -72,7 +87,7 @@ Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 surface(reshape(R_list',[N,N]),'CDataMapping','scaled');
 colormap('jet');
-view(3)
+view(3);
 % Simulating energy decay below the waveguide
 %{
 alpha = 0.5;% decay rate 
