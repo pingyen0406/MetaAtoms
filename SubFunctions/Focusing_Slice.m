@@ -26,7 +26,6 @@ for i= 1:length(x_list)
     end
 end
 field = sum(field,3);
-field = sum(field,3);
 figure;
 colormap('jet');
 image(z_list,x_list,real(field),'CDataMapping','scaled');

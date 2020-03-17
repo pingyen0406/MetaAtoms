@@ -1,4 +1,4 @@
-clear all;clc;
+clear all; close all; clc;
 % For Linux path
 %folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
 %addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
@@ -31,9 +31,8 @@ tmpPos = cell(N);
 atomPos = zeros(0,0);
 
 % creating a circular shape meta-atoms
-%{
-for i=1:N
-    for j=1:N
+for i=0:N
+    for j=0:N
         x_now = period*(i-floor(N/2));
         y_now = period*(j-floor(N/2));
         if x_now^2+y_now^2 < lens_radius^2
@@ -44,18 +43,19 @@ for i=1:N
         end               
     end
 end
-%}
+
 % creating a square shape metalens   
-for i=1:N
-    for j=1:N
+%{
+for i=0:N-1
+    for j=0:N-1
         x_now = period*(i-floor(N/2));
         y_now = period*(j-floor(N/2));
         atomPos=cat(2,atomPos,[x_now;y_now]);                   
     end
 end
-
+%}
 %---------------------------- Test data-------------------------------
-
+%{
 test_name = 'perfectAtom.txt';
 test_f = readmatrix(test_name);
 test_r = transpose(test_f(:,1));
@@ -66,6 +66,7 @@ Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,test_Phase,test_T,test_r);
 focal_field=Focal_Slice(Dphase,T_list,atomPos,[-16,16],[-16,16],f,320,320,1.55);
 focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-16,16],[1,41],0,320,400,1.55);
+%}
 %-----------------------------------------------------------------------
 
 % Choosing desired part of phase data
@@ -78,7 +79,6 @@ T = T(1,start_index:stop_index);
 R_list = R_list(1,start_index:stop_index);
 
 % Taking propagation phase into consideration 
-
 %delay_phase = PropCorrect(N,lattice,neff,wavelength);
 %delay_phase = NorPhase(delay_phase);
 
@@ -88,6 +88,7 @@ Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
 surface(reshape(R_list',[N,N]),'CDataMapping','scaled');
 colormap('jet');
 view(3);
+
 % Simulating energy decay below the waveguide
 %{
 alpha = 0.5;% decay rate 
