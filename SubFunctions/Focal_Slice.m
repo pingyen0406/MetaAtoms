@@ -11,8 +11,8 @@ function field=Focal_Slice(Phase,T,atom_pos,x_range,y_range,z,x_res,y_res,lambda
 % lambda: operating wavelength 
 x_list = linspace(x_range(1),x_range(2),x_res);
 y_list = linspace(y_range(1),y_range(2),y_res);
-r_list = zeros(0,0);
-field = zeros(0,0,0);
+field = zeros;
+tmpField=zeros;
 % r_list is a 3-dim matrix. r_list(i,j,k) means distance from k-th 
 % meta-atom to x_list(i) and y_list(j). So is field.
 for i= 1:length(x_list)
@@ -21,9 +21,10 @@ for i= 1:length(x_list)
             tmp_rr=(x_list(i)-atom_pos(1,k))^2+(y_list(1,j)...
                 -atom_pos(2,k))^2+z^2;
             tmp_phase=sqrt(tmp_rr)/lambda;    
-            field(i,j,k) = (1/sqrt(tmp_rr))*T(k)*...
+            tmpField(k) = (1/sqrt(tmp_rr))*T(k)*...
                 exp(1i*2*pi*tmp_phase)*exp(1i*2*pi*Phase(k));
         end
+        field(i,j)=sum(tmpField);
     end
 end
 field = sum(field,3);

@@ -69,6 +69,8 @@ focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-16,16],[1,41],0,320,400,1.
 %}
 %-----------------------------------------------------------------------
 
+tic;
+
 % Choosing desired part of phase data
 Phase=NorPhase(Phase);
 % Set an breakpoint this line to check the phase data.
@@ -85,9 +87,9 @@ R_list = R_list(1,start_index:stop_index);
 % Creating focusing phase profile and doing interpolation
 Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
-surface(reshape(R_list',[N,N]),'CDataMapping','scaled');
-colormap('jet');
-view(3);
+%surface(reshape(R_list',[N,N]),'CDataMapping','scaled');
+%colormap('jet');
+%view(3);
 
 % Simulating energy decay below the waveguide
 %{
@@ -99,7 +101,7 @@ end
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
-    %focal_field=Focal_Slice(Dphase,T_list,atomPos,[-20,20],[-20,20],100,200,200,1.55);
+    %focal_field=Focal_Slice(Dphase,T_list,atomPos,[-20,20],[-20,20],f,400,400,1.55);
     focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-20,20],[1,61],0,200,300,1.55);
 end
 
@@ -111,6 +113,6 @@ if outputlist==true
     end
     fclose(outf);
 end
-
+toc;
 
 
