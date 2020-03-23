@@ -12,10 +12,9 @@ function field=Focusing_Slice(Phase,T,atom_pos,x_range,z_range,y,x_res,z_res,lam
 % lambda: operating wavelength 
 x_list = linspace(x_range(1),x_range(2),x_res);
 z_list = linspace(z_range(1),z_range(2),z_res);
-field = zeros;
-tmpField = zeros;
-% r_list is a 3-dim matrix. r_list(i,j,k) means distance from k-th 
-% meta-atom to x_list(i) and z_list(j). So is field.
+field = zeros(length(x_list),length(z_list));
+tmpField=zeros(1,length(atom_pos));
+
 for i= 1:length(x_list)
     for j=1:length(z_list)
         for k=1:length(atom_pos)

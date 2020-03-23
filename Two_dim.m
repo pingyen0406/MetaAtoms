@@ -22,8 +22,8 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-f = 30; % focal length
-lens_radius = 15; % radius or length of metalens
+f = 3000; % focal length
+lens_radius = 22.5; % radius or length of metalens
 N = floor(2*lens_radius/period); % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
@@ -31,6 +31,7 @@ tmpPos = cell(N);
 atomPos = zeros(0,0);
 
 % creating a circular shape meta-atoms
+
 for i=0:N
     for j=0:N
         x_now = period*(i-floor(N/2));
@@ -54,8 +55,9 @@ for i=0:N-1
     end
 end
 %}
-%---------------------------- Test data-------------------------------
-%{
+%---------------------------- Test data-----------------------------------
+
+tic;
 test_name = 'perfectAtom.txt';
 test_f = readmatrix(test_name);
 test_r = transpose(test_f(:,1));
@@ -64,10 +66,11 @@ test_Phase = NorPhase(transpose(test_f(:,3)));
 test_Phase(1,end)=0;
 Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,test_Phase,test_T,test_r);
-focal_field=Focal_Slice(Dphase,T_list,atomPos,[-16,16],[-16,16],f,320,320,1.55);
-focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-16,16],[1,41],0,320,400,1.55);
+%focal_field=Focal_Slice(Dphase,T_list,atomPos,[-16,16],[-16,16],f,320,320,1.55);
+focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-25,25],[1,5001],0,100,1000,1.55);
+toc;
 %}
-%-----------------------------------------------------------------------
+%--------------------------------------------------------------------------
 
 tic;
 
@@ -87,6 +90,7 @@ R_list = R_list(1,start_index:stop_index);
 % Creating focusing phase profile and doing interpolation
 Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
+
 %surface(reshape(R_list',[N,N]),'CDataMapping','scaled');
 %colormap('jet');
 %view(3);
@@ -101,8 +105,8 @@ end
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
-    %focal_field=Focal_Slice(Dphase,T_list,atomPos,[-20,20],[-20,20],f,400,400,1.55);
-    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-20,20],[1,61],0,200,300,1.55);
+    %focal_field=Focal_Slice(Dphase,T_list,atomPos,[-25,25],[-25,25],f,500,500,1.55);
+    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-25,25],[1001,5001],0,100,1000,1.55);
 end
 
 % Output List
