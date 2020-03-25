@@ -1,13 +1,13 @@
-clear all;clc;
+clear all; close all;
 % For Linux path
 %folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-%addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/");
+%addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
 % For Windows path
-folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/TopAl2O3/';
-addpath("D:/Dropbox/MATLAB/MetaAtoms/");
+folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
-outputlist = true;
+outputlist = false;
 outputname = [folder_path,'spherical1200.txt'];
 plot_field = true;
 
@@ -23,13 +23,15 @@ R_list = [0.03:0.002:0.248];
 % Parameters
 lattice = 0.562;
 f = 46.8; % focal length
-N = 100; % number of meta-atoms
+N = 101; % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 atomPos = zeros(2,N);
 % crate x-position array of meta-atoms
 for i=1:N
-    atomPos(1,i)=lattice*i;
+    x_now = i-floor(N/2)-1;
+    atomPos(1,i)=lattice*x_now;
+    
 end 
 %---------------------------- Test data-------------------------------
 %{
@@ -44,6 +46,7 @@ Field=Eatom(Dphase,amp_list,atomPos,[0,60],[1,20],0,1200,400,1.55);
 %}
 %-----------------------------------------------------------------------
 
+tic;
 % Choosing desired part of phase data
 Phase=NorPhase(Phase);
 % Set an breakpoint this line to check the phase data.
@@ -58,8 +61,8 @@ R_list = R_list(1,start_index:stop_index);
 %delay_phase = NorPhase(delay_phase);
 
 % Creating focusing phase profile and doing interpolation
-Dphase = 1dSpherical(0,f,lattice,N,1.55);
-[R_list,T_list]=Interpolation(delay_phase,Phase,T,R_list);
+Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
+[R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 
 % Simulating energy decay below the waveguide
 %{
@@ -71,7 +74,8 @@ end
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
-    Field=Eatom(Dphase,T_list,atomPos,[0,60],[1,61],0,600,600,1.55);
+    focal_field=Focal_Slice(Dphase,T_list,atomPos,[-30,30],[-30,30],f,200,200,1.55);
+    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-30,30],[1,101],0,100,1000,1.55);
 end
 
 % Output List
@@ -82,5 +86,5 @@ if outputlist==true
     end
     fclose(outf);
 end
-
+toc;
 
