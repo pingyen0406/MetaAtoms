@@ -22,8 +22,9 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-f = 60; % focal length
-lens_radius = 1000; % radius or length of metalens
+f = 100; % focal length
+beta = 0.05; % beta angle of axicon
+lens_radius = 20; % radius or length of metalens
 N = floor(2*lens_radius/period); % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
@@ -31,7 +32,7 @@ tmpPos = cell(N);
 atomPos = zeros(0,0);
 
 % creating a circular shape meta-atoms
-%{
+
 for i=0:N
     for j=0:N
         x_now = period*(i-floor(N/2));
@@ -46,7 +47,7 @@ for i=0:N
 end
 %}
 % creating a square shape metalens   
-
+%{
 for i=0:N-1
     for j=0:N-1
         x_now = period*(i-floor(N/2));
@@ -105,8 +106,8 @@ end
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
-    focal_field=Focal_Slice(Dphase,T_list,atomPos,[-25,25],[-25,25],f,200,200,1.55);
-    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-25,25],[1,121],0,100,1200,1.55);
+    focal_field=Focal_Slice(Dphase,T_list,atomPos,[-25,25],[-25,25],f,250,250,1.55);
+    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-25,25],[1,151],0,250,750,1.55);
 end
 
 % Output List
@@ -118,5 +119,8 @@ if outputlist==true
     fclose(outf);
 end
 toc;
-
+% Check the Radius and Transmission distribution
+figure;
+scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
+title("Transmission distribution");
 

@@ -1,7 +1,10 @@
 function Phase = NorPhase(Phase)
-% This function normalizes the phase data and find the relative phase from 
-% the first one.
-
+% This function normalizes the phase data and the first one start at -1.
+% Input:
+% Phase: Ascending or descending phase data. Can be either normalized or
+% not.
+% Output: Normalized phase between [-1,0]. The first one starts from -1 and
+% ascends.
 % Normalize the phase 
 if max(max(Phase))>1 | min(min(Phase))<-1
     Phase=Phase/2/pi;

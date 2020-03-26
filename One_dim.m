@@ -1,4 +1,4 @@
-clear all; close all;
+clear all;
 % For Linux path
 %folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
 %addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
@@ -21,16 +21,17 @@ Phase = all_Phase(height/10-50+1,:);
 R_list = [0.03:0.002:0.248];
 
 % Parameters
-lattice = 0.562;
-f = 46.8; % focal length
-N = 101; % number of meta-atoms
+period = 0.562;
+f = 100; % focal length
+L = 40;
+N = floor(L/period); % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 atomPos = zeros(2,N);
 % crate x-position array of meta-atoms
 for i=1:N
     x_now = i-floor(N/2)-1;
-    atomPos(1,i)=lattice*x_now;
+    atomPos(1,i)=period*x_now;
     
 end 
 %---------------------------- Test data-------------------------------
@@ -50,8 +51,8 @@ tic;
 % Choosing desired part of phase data
 Phase=NorPhase(Phase);
 % Set an breakpoint this line to check the phase data.
-start_index=30;
-stop_index=79;
+start_index=1;
+stop_index=77;
 Phase = Truncated_Phase(Phase,start_index,stop_index);
 T = T(1,start_index:stop_index);
 R_list = R_list(1,start_index:stop_index);
@@ -74,8 +75,8 @@ end
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
-    focal_field=Focal_Slice(Dphase,T_list,atomPos,[-30,30],[-30,30],f,200,200,1.55);
-    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-30,30],[1,101],0,100,1000,1.55);
+    focal_field=Focal_Slice(Dphase,T_list,atomPos,[-30,30],[-30,30],f,300,300,1.55);
+    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-30,30],[1,151],0,300,750,1.55);
 end
 
 % Output List
@@ -87,4 +88,9 @@ if outputlist==true
     fclose(outf);
 end
 toc;
+% Check the Radius and Transmission distribution
+figure;
+scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
+title("Transmission distribution");
+
 
