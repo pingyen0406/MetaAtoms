@@ -1,4 +1,4 @@
-function field=Focusing_Slice(Phase,T,atom_pos,x_range,z_range,y,x_res,z_res,lambda)
+function field=Focusing_Slice(Phase,T,atomPos,x_range,z_range,y,x_res,z_res,lambda,symmetry)
 % Calaulating and plotting the focusing behavior from the meta-atoms to the
 % focal spot.
 % Unit in "micron".
@@ -10,21 +10,26 @@ function field=Focusing_Slice(Phase,T,atom_pos,x_range,z_range,y,x_res,z_res,lam
 % x_res & z_res: resolution in x & y.
 % y: where to slice
 % lambda: operating wavelength 
+% symmetry: true or false. Use symmetric property to reduce time.
+type = "focusing";
 x_list = linspace(x_range(1),x_range(2),x_res);
 z_list = linspace(z_range(1),z_range(2),z_res);
-field = zeros(length(x_list),length(z_list));
-tmpField=zeros(1,length(atom_pos));
 
-for i= 1:length(x_list)
-    for j=1:length(z_list)
-        for k=1:length(atom_pos)
-            tmp_rr=(x_list(i)-atom_pos(1,k))^2+(y-atom_pos(2,k))^2+z_list(j)^2;
-            tmp_phase=sqrt(tmp_rr)/lambda;    
-            tmpField(k) = (1/sqrt(tmp_rr))*T(k)*...
-                exp(1i*2*pi*tmp_phase)*exp(1i*2*pi*Phase(k));
-        end
-        field(i,j)=sum(tmpField);
+if symmetry == false
+    field = pointSource_field(Phase,T,atomPos,x_list,z_list,y,1.55,type);
+elseif symmetry == true
+    x_len = floor(length(x_list)/2);
+    field = pointSource_field(Phase,T,atomPos,x_list(1:x_len),...
+        z_list,y,lambda,type);
+    field = cat(1,field,flip(field,1));
+    % If the interval is odd, it needs to calculate the middle line.
+    if mod(x_len,2)~=0
+        mid_field = pointSource_field(Phase,T,atomPos,x_list(x_len+1),...
+        z_list,y,lambda,type);
+        field = [field(1:x_len,:);mid_field;field(x_len+1:end,:)];
     end
+else
+    error("Wrong input on symmetry");
 end
 figure;
 colormap('jet');

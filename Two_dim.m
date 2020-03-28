@@ -22,9 +22,9 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-f = 100; % focal length
+f = 50; % focal length
 beta = 0.05; % beta angle of axicon
-lens_radius = 20; % radius or length of metalens
+lens_radius = 10; % radius or length of metalens
 N = floor(2*lens_radius/period); % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
@@ -106,8 +106,8 @@ end
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
-    focal_field=Focal_Slice(Dphase,T_list,atomPos,[-25,25],[-25,25],f,250,250,1.55);
-    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-25,25],[1,151],0,250,750,1.55);
+    %focal_field=Focal_Slice(Dphase,T_list,atomPos,[-25,25],[-25,25],f,250,250,1.55,true);
+    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-25,25],[1,101],0,250,500,1.55,true);
 end
 
 % Output List
