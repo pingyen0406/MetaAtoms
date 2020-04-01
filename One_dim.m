@@ -35,12 +35,13 @@ for i=1:N
     
 end 
 %---------------------------- Test data-------------------------------
-%{
+
 test_name = 'perfectAtom.txt';
 test_f = readmatrix(test_name);
 test_r = transpose(test_f(:,1));
 test_T = transpose(test_f(:,2));
 test_Phase = transpose(test_f(:,3));
+tt = NorPhase(test_Phase);
 [sphericalList,Dphase] = SphericalOutput(test_Phase,test_T,test_r,f,lattice,N,1.55);
 amp_list = interp1(test_r,test_T,sphericalList);
 Field=Eatom(Dphase,amp_list,atomPos,[0,60],[1,20],0,1200,400,1.55);

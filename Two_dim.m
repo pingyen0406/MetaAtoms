@@ -1,3 +1,20 @@
+% Calculating the scalar field emitted by 2D meta-atom array. 
+% General usage:
+% 1. Reading the phase and transmission data from RCWA calculation.
+% 2. Setting the parameters. (period, lens size, focal length...)
+% 3. Creating 2xN matrix that contain position of every meta-atom.
+% 4. Using NorPhase.m to check the phase data. And using Truncated_Phase.m to
+% pick out the interval if needed.
+% 5. Using SphericalOutput.m or axiconOutput.m to generate the desired
+% phase profile of every meta-atom. And then using Interploation.m to find
+% the corresponding radius and transmission.
+% 6.Using Focal_slice.m or Focusing_slice.m to calaulate the field at given
+% position. If there is symmetric property of the lens, the computation
+% time can reduce 1/2 or 3/4.
+
+
+
+
 clear all; close all;
 % For Linux path
 %folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
@@ -77,7 +94,8 @@ tic;
 
 % Choosing desired part of phase data
 Phase=NorPhase(Phase);
-% Set an breakpoint this line to check the phase data.
+%%%%%%%%% Set an breakpoint this line to check the phase data.%%%%%%%
+
 start_index=1;
 stop_index=77;
 Phase = Truncated_Phase(Phase,start_index,stop_index);
@@ -89,12 +107,8 @@ R_list = R_list(1,start_index:stop_index);
 %delay_phase = NorPhase(delay_phase);
 
 % Creating focusing phase profile and doing interpolation
-Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
+Dphase = axiconOutput(0,beta,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
-
-%surface(reshape(R_list',[N,N]),'CDataMapping','scaled');
-%colormap('jet');
-%view(3);
 
 % Simulating energy decay below the waveguide
 %{

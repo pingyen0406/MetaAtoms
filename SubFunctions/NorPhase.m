@@ -1,5 +1,5 @@
 function Phase = NorPhase(Phase)
-% This function normalizes the phase data and the first one start at -1.
+% This function normalizes the phase data and sets the first one = -1.
 % Input:
 % Phase: Ascending or descending phase data. Can be either normalized or
 % not.
