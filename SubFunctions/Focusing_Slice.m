@@ -10,7 +10,7 @@ function field=Focusing_Slice(Phase,T,atomPos,x_range,z_range,y,x_res,z_res,lamb
 % x_res & z_res: resolution in x & y.
 % y: where to slice
 % lambda: operating wavelength 
-% symmetry: true or false. Use symmetric property to reduce time.
+% symmetry: true or false. Use x-symmetric property to reduce 1/2 time.
 type = "focusing";
 x_list = linspace(x_range(1),x_range(2),x_res);
 z_list = linspace(z_range(1),z_range(2),z_res);

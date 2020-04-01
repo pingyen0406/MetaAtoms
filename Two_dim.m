@@ -1,27 +1,27 @@
 % Calculating the scalar field emitted by 2D meta-atom array. 
-% General usage:
-% 1. Reading the phase and transmission data from RCWA calculation.
-% 2. Setting the parameters. (period, lens size, focal length...)
-% 3. Creating 2xN matrix that contain position of every meta-atom.
-% 4. Using NorPhase.m to check the phase data. And using Truncated_Phase.m to
-% pick out the interval if needed.
-% 5. Using SphericalOutput.m or axiconOutput.m to generate the desired
-% phase profile of every meta-atom. And then using Interploation.m to find
-% the corresponding radius and transmission.
+% General using method:
+% 1.Reading the phase and transmission data from simulation(S4).
+% 2.Setting the parameters. (period, lens size, focal length...)
+% 3.Creating 2xN matrix that contain position of every meta-atom.
+% 4.Using NorPhase.m to check the phase data. And using Truncated_Phase.m
+%   to pick out the interval if needed.
+% 5.Using SphericalOutput.m or axiconOutput.m to generate the desired
+%   phase profile of every meta-atom. And then using Interploation.m to 
+%   find the corresponding radius and transmission.
 % 6.Using Focal_slice.m or Focusing_slice.m to calaulate the field at given
-% position. If there is symmetric property of the lens, the computation
-% time can reduce 1/2 or 3/4.
+%   position. If there is symmetric property of the lens, the computation
+%   time can reduce to 1/2 or 1/4 time.
 
 
 
 
 clear all; close all;
-% For Linux path
-%folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-%addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
-% For Windows path
-folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
+% Linux path
+folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
+% Windows path
+%folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+%addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
 outputlist = false;
@@ -39,9 +39,9 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-f = 50; % focal length
+f = 1000; % focal length
 beta = 0.05; % beta angle of axicon
-lens_radius = 10; % radius or length of metalens
+lens_radius = 100; % radius or length of metalens
 N = floor(2*lens_radius/period); % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
@@ -49,7 +49,7 @@ tmpPos = cell(N);
 atomPos = zeros(0,0);
 
 % creating a circular shape meta-atoms
-
+%{
 for i=0:N
     for j=0:N
         x_now = period*(i-floor(N/2));
@@ -64,15 +64,19 @@ for i=0:N
 end
 %}
 % creating a square shape metalens   
-%{
-for i=0:N-1
-    for j=0:N-1
+tic;
+for i=0:floor(N/2)
+    for j=0:floor(N/2)
         x_now = period*(i-floor(N/2));
         y_now = period*(j-floor(N/2));
-        atomPos=cat(2,atomPos,[x_now;y_now]);                   
+        atomPos=cat(2,atomPos,[x_now;y_now]);     
     end
 end
+atomPos = cat(2,atomPos,[-atomPos(1,:);atomPos(2,:)],[-atomPos(1,:);-atomPos(2,:)],...
+    [atomPos(1,:);-atomPos(2,:)]);
 %}
+toc;
+
 %---------------------------- Test data-----------------------------------
 %{
 tic;
@@ -89,6 +93,8 @@ focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-25,25],[1,201],0,100,2000,
 toc;
 %}
 %--------------------------------------------------------------------------
+
+
 
 tic;
 
@@ -120,8 +126,10 @@ end
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
-    %focal_field=Focal_Slice(Dphase,T_list,atomPos,[-25,25],[-25,25],f,250,250,1.55,true);
-    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-25,25],[1,101],0,250,500,1.55,true);
+    %focal_field=Focal_Slice(Dphase,T_list,atomPos,...
+    %[-25,25],[-25,25],f,250,250,1.55,true);
+    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
+        [-25,25],[1,101],0,250,500,1.55,true);
 end
 
 % Output List

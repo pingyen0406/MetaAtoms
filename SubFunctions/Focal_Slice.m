@@ -10,7 +10,7 @@ function field=Focal_Slice(Phase,T,atomPos,x_range,y_range,z,x_res,y_res,...
 % x_res & y_res: resolution in x & y.
 % z: where to slice
 % lambda: operating wavelength 
-% symmetry: true or flase. Use symmetric property to reduce time.
+% symmetry: true or flase. Use x-y symmetric property to reduce 3/4 time.
 x_list = linspace(x_range(1),x_range(2),x_res);
 y_list = linspace(y_range(1),y_range(2),y_res);
 type = "focal";

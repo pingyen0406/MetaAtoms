@@ -7,13 +7,13 @@ function field_matrix = pointSource_field(Phase,T,atomPos,interval_1,...
 % Phase: starting phase at z=0, and should be 1D array.
 % atom_pos: x,y position array of meta-atoms, which should be 2xN array.
 % T : transmission = amplitude, and should be 1D array.
-% interval_1: grid point array of x
+% interval_1: grid point array of x (plane of metasurfaces)
 % interval_2: grid point array of y or z
 % slicePoint: where to slice on normal axis
 % lambda: operating wavelength 
 % Output:
 % field_matrix: scalar value on given intervals
-% type: 'focal' or 'focusing'..
+% type: 'focal' or 'focusing' plane
 tmpField=zeros(1,length(atomPos));
 field_matrix = zeros(length(interval_1),length(interval_2));
 if type == "focal"
