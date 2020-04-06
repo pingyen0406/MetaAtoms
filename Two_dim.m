@@ -17,16 +17,16 @@
 
 clear all; close all;
 % Linux path
-folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
+%folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+%addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
 % Windows path
-%folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-%addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
+folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
 outputlist = false;
 outputname = [folder_path,'spherical1200.txt'];
-plot_field = true;
+plot_field = false;
 
 % Read data from S4
 % (i,j) is 500+10*i nm height and 100+1*j nm radius
@@ -39,17 +39,38 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-f = 1000; % focal length
+f = 100; % focal length
 beta =5; % beta angle of axicon(in degree)
-lens_radius = 100; % radius or length of metalens
+lens_radius = 20; % radius or length of metalens
 N = floor(2*lens_radius/period); % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
-tmpPos = cell(N);
 atomPos = zeros(0,0);
-
+tmpPos = zeros(0,0);
 % creating a circular shape meta-atoms
 %{
+for i=0:0.5:360
+    for j=1:floor(N/2)
+        x_now = period*j;
+        if x_now < lens_radius     
+            [tmpPos(1,j),tmpPos(2,j)] = cart2pol(x_now,0);
+
+        end
+    end
+    rad_i = deg2rad(i);
+    
+    if i>0 && i<360
+        atomPos = cat(2,atomPos,[tmpPos(1,:)+rad_i;tmpPos(2,:)]);
+    elseif i==0
+        atomPos = tmpPos;
+    else
+        continue
+    end
+     
+end
+[atomPos(1,:),atomPos(2,:)] = pol2cart(atomPos(1,:),atomPos(2,:));
+atomPos = cat(2,[0;0],atomPos);
+%}
 for i=0:N
     for j=0:N
         x_now = period*(i-floor(N/2));
@@ -64,6 +85,7 @@ for i=0:N
 end
 %}
 % creating a square shape metalens   
+%{
 for i=0:floor(N/2)
     for j=0:floor(N/2)
         x_now = period*(i-floor(N/2));
@@ -93,8 +115,6 @@ toc;
 %}
 %--------------------------------------------------------------------------
 
-
-
 tic;
 
 % Choosing desired part of phase data
@@ -112,7 +132,7 @@ R_list = R_list(1,start_index:stop_index);
 %delay_phase = NorPhase(delay_phase);
 
 % Creating focusing phase profile and doing interpolation
-Dphase = axiconOutput(0,beta,[0,0],atomPos,1.55);
+Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 
 % Simulating energy decay below the waveguide
@@ -141,7 +161,10 @@ if outputlist==true
 end
 toc;
 % Check the Radius and Transmission distribution
-%figure;
-%scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
-%title("Transmission distribution");
+figure;
+scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
+title("Transmission distribution");
+figure;
+scatter3(atomPos(1,:),atomPos(2,:),R_list,'filled');
+title("Transmission distribution");
 

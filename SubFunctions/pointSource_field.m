@@ -13,7 +13,8 @@ function field_matrix = pointSource_field(Phase,T,atomPos,interval_1,...
 % lambda: operating wavelength 
 % Output:
 % field_matrix: scalar value on given intervals
-% type: 'focal' or 'focusing' plane
+% type: 'focal' or 'focusing' plane. The distance term has slight
+% difference.
 tmpField=zeros(1,length(atomPos));
 field_matrix = zeros(length(interval_1),length(interval_2));
 if type == "focal"
