@@ -17,11 +17,11 @@
 
 clear all; close all;
 % Linux path
-folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
+%folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+%addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
 % Windows path
-%folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-%addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
+folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
 outputlist = false;
@@ -40,8 +40,8 @@ R_list = [0.03:0.002:0.248];
 % Parameters
 period = 0.562;
 f = 1000; % focal length
-beta = 0.05; % beta angle of axicon
-lens_radius = 100; % radius or length of metalens
+beta =5; % beta angle of axicon(in degree)
+lens_radius = 30; % radius or length of metalens
 N = floor(2*lens_radius/period); % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
@@ -64,7 +64,6 @@ for i=0:N
 end
 %}
 % creating a square shape metalens   
-tic;
 for i=0:floor(N/2)
     for j=0:floor(N/2)
         x_now = period*(i-floor(N/2));
@@ -75,7 +74,7 @@ end
 atomPos = cat(2,atomPos,[-atomPos(1,:);atomPos(2,:)],[-atomPos(1,:);-atomPos(2,:)],...
     [atomPos(1,:);-atomPos(2,:)]);
 %}
-toc;
+
 
 %---------------------------- Test data-----------------------------------
 %{
@@ -129,7 +128,7 @@ if plot_field==true
     %focal_field=Focal_Slice(Dphase,T_list,atomPos,...
     %[-25,25],[-25,25],f,250,250,1.55,true);
     focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
-        [-25,25],[1,101],0,250,500,1.55,true);
+        [-30,30],[1,501],0,600,500,1.55,true);
 end
 
 % Output List
@@ -142,7 +141,7 @@ if outputlist==true
 end
 toc;
 % Check the Radius and Transmission distribution
-figure;
-scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
-title("Transmission distribution");
+%figure;
+%scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
+%title("Transmission distribution");
 
