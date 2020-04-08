@@ -17,44 +17,29 @@ type = "focal";
 
 if symmetry==false
     field = pointSource_field(Phase,T,atomPos,x_list,y_list,z,lambda,type);
+    
+    field = field';
+    figure;
+    colormap('jet');
+    image(x_list,y_list,real(field),'CDataMapping','scaled');
+    title(['real part at z=',num2str(z),'um']);
+    xlabel('x');ylabel('y');
+    figure;
+    colormap('jet');
+    image(x_list,y_list,imag(field),'CDataMapping','scaled');
+    title(['imag part at z=',num2str(z),'um']);
+    xlabel('x');ylabel('y');
+    figure;
+    colormap('jet');
+    image(x_list,y_list,abs(field),'CDataMapping','scaled');
+    title(['Absolute value at z=',num2str(z),'um']);
+    xlabel('x');ylabel('y');
       
 elseif symmetry==true  
-    x_len = floor(length(x_list)/2);
-    y_len = floor(length(y_list)/2);
-    field = pointSource_field(Phase,T,atomPos,x_list(1:x_len),...
-        y_list(1:y_len),z,lambda,type);
-    field = cat(2,field,flip(field,2));
-    field = cat(1,field,flip(field,1));
-    % If the interval is odd, it needs to calculate the middle line.
-    if mod(length(x_list),2)~=0
-        mid_field1=pointSource_field(Phase,T,atomPos,x_list(x_len+1),...
-            y_list(1:y_len),z,lambda,type);
-        center_field = pointSource_field(Phase,T,atomPos,x_list(x_len+1),...
-            y_list(y_len+1),z,lambda,type);
-        mid_field_1 = cat(1,midfield_1,flip(mid_field1,1)); % vertical field without center point
-        mid_field_2 = [mid_field_1(1,1:x_len)',center_field,mid_field_1(1,x_len+1:end)'];
-        field = [field(:,1:y_len),mid_field_1,field(:,y_len+1:end)];
-        field = [field(1:x_len,:);mid_field_2;field(x_len+1:end,:)];
-    end
+    field = Focal_Slice_2(Phase,T,atomPos,x_range,y_range,z,x_res,y_res,lambda);  
      
 else
     error("Wrong input on symmetry");
 end
-field = field';
 
-figure;
-colormap('jet');
-image(x_list,y_list,real(field),'CDataMapping','scaled');
-title(['real part at z=',num2str(z),'um']);
-xlabel('x');ylabel('y');
-figure;
-colormap('jet');
-image(x_list,y_list,imag(field),'CDataMapping','scaled');
-title(['imag part at z=',num2str(z),'um']);
-xlabel('x');ylabel('y');
-figure;
-colormap('jet');
-image(x_list,y_list,abs(field),'CDataMapping','scaled');
-title(['Absolute value at z=',num2str(z),'um']);
-xlabel('x');ylabel('y');
 end

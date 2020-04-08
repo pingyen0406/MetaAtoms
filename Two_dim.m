@@ -26,7 +26,7 @@ fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
 outputlist = false;
 outputname = [folder_path,'spherical1200.txt'];
-plot_field = false;
+plot_field = true;
 
 % Read data from S4
 % (i,j) is 500+10*i nm height and 100+1*j nm radius
@@ -145,11 +145,14 @@ end
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
-    %focal_field=Focal_Slice(Dphase,T_list,atomPos,...
-    %[-25,25],[-25,25],f,250,250,1.55,true);
-    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
-        [-100,100],[1,1501],0,1000,1000,1.55,true);
+    %focal_field=Focal_Slice_2(Dphase,T_list,atomPos,...
+    %[-30,29],[-30,29],50,300,300,1.55,true);
+    %focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
+    %    [-100,100],[1,1501],0,1000,1000,1.55,true);
+    focal_field2=Focal_Slice(Dphase,T_list,atomPos,...
+    [-30,29],[-30,29],50,300,300,1.55,true); 
 end
+
 
 % Output List
 if outputlist==true 
@@ -161,10 +164,12 @@ if outputlist==true
 end
 toc;
 % Check the Radius and Transmission distribution
-figure;
-scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
-title("Transmission distribution");
-figure;
-scatter3(atomPos(1,:),atomPos(2,:),R_list,'filled');
-title("Transmission distribution");
+%figure;
+%scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
+%title("Transmission distribution");
+%figure;
+%scatter3(atomPos(1,:),atomPos(2,:),R_list,'filled');
+%title("Transmission distribution");
+
+
 
