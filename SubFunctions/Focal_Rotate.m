@@ -47,6 +47,7 @@ F = scatteredInterpolant(field(1,:)',field(2,:)',field(3,:)','natural','none');
 [xq,yq] = meshgrid(x_min:((x_max-x_min)/x_res):x_max,...
     y_min:((y_max-y_min)/y_res):y_max);
 zq = F(xq,yq);
+field=zq;
 figure;
 colormap('jet');
 image(xq(1,:),yq(:,1),real(zq),'CDataMapping','scaled');

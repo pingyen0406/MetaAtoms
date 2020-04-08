@@ -1,4 +1,4 @@
-clear all;
+clear all;close all
 % For Linux path
 %folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
 %addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
@@ -22,8 +22,9 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-f = 100; % focal length
-L = 40;
+beta = 31;% beta angle for axicon lens
+f = 47.6; % focal length
+L = 56.2;
 N = floor(L/period); % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
@@ -35,7 +36,7 @@ for i=1:N
     
 end 
 %---------------------------- Test data-------------------------------
-
+%{
 test_name = 'perfectAtom.txt';
 test_f = readmatrix(test_name);
 test_r = transpose(test_f(:,1));
@@ -52,18 +53,18 @@ tic;
 % Choosing desired part of phase data
 Phase=NorPhase(Phase);
 % Set an breakpoint this line to check the phase data.
-start_index=1;
-stop_index=77;
+start_index=35;
+stop_index=79;
 Phase = Truncated_Phase(Phase,start_index,stop_index);
 T = T(1,start_index:stop_index);
 R_list = R_list(1,start_index:stop_index);
 
 % Taking propagation phase into consideration 
-%delay_phase = PropCorrect(N,lattice,neff,wavelength);
-%delay_phase = NorPhase(delay_phase);
-
+delay_phase = PropCorrect(length(atomPos),period,neff,wavelength);
+delay_phase = NorPhase(delay_phase);
+tic;
 % Creating focusing phase profile and doing interpolation
-Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
+Dphase = SphericalOutput(delay_phase,f,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 
 % Simulating energy decay below the waveguide
@@ -73,11 +74,16 @@ for i=1:N
     T_list(1,i)=(1-alpha*i/N)*T_list(1,i);
 end
 %}
-
+%Dphase = repmat(Dphase,1,5);
+%T_list = repmat(T_list,1,5);
+%atomPos = cat(2,atomPos,[atomPos(1,:);atomPos(2,:)-2*period],[atomPos(1,:);atomPos(2,:)-1*period],...
+%   [atomPos(1,:);atomPos(2,:)+period],[atomPos(1,:);atomPos(2,:)+2*period]);
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
-    focal_field=Focal_Slice(Dphase,T_list,atomPos,[-30,30],[-30,30],f,300,300,1.55);
-    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-30,30],[1,151],0,300,750,1.55);
+    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
+        [-30,29],[1,100],0,600,1000,1.55,false);
+    focal_field=Focal_Slice(Dphase,T_list,atomPos,...
+    [-30,29],[-30,29],f,600,600,1.55,false); 
 end
 
 % Output List

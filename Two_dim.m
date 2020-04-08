@@ -24,8 +24,8 @@ folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
 addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
-outputlist = false;
-outputname = [folder_path,'spherical1200.txt'];
+outputlist = true;
+outputname = [folder_path,'axicon1200.txt'];
 plot_field = true;
 
 % Read data from S4
@@ -39,15 +39,16 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-f = 500; % focal length
-beta =5; % beta angle of axicon(in degree)
-lens_radius = 100; % radius or length of metalens
+f = 10000; % focal length
+beta =31; % beta angle of axicon(in degree)
+lens_radius = 28.1; % radius or length of metalens
 N = floor(2*lens_radius/period); % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 atomPos = zeros(0,0);
 tmpPos = zeros(0,0);
 % Creating circular shape metalens
+%{
 for i=0:floor(N/2)    
     for j=0:floor(N/2)
         x_now = period*i;
@@ -63,7 +64,7 @@ atomPos = cat(2,atomPos,[-atomPos(1,2:end);atomPos(2,2:end)],...
     [-atomPos(1,2:end);-atomPos(2,2:end)],[atomPos(1,2:end);-atomPos(2,2:end)]);
 %}
 % creating a square shape metalens   
-%{
+
 for i=0:floor(N/2)
     for j=0:floor(N/2)
         x_now = period*(i-floor(N/2));
@@ -93,24 +94,24 @@ toc;
 %}
 %--------------------------------------------------------------------------
 
-tic;
+
 
 % Choosing desired part of phase data
 Phase=NorPhase(Phase);
 %%%%%%%%% Set an breakpoint this line to check the phase data.%%%%%%%
 
-start_index=1;
-stop_index=77;
+start_index=35;
+stop_index=79;
 Phase = Truncated_Phase(Phase,start_index,stop_index);
 T = T(1,start_index:stop_index);
 R_list = R_list(1,start_index:stop_index);
 
 % Taking propagation phase into consideration 
-%delay_phase = PropCorrect(N,lattice,neff,wavelength);
-%delay_phase = NorPhase(delay_phase);
-
+delay_phase = PropCorrect(length(atomPos),period,neff,wavelength);
+delay_phase = NorPhase(delay_phase);
+tic;
 % Creating focusing phase profile and doing interpolation
-Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
+Dphase = axiconOutput(delay_phase,beta,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 
 % Simulating energy decay below the waveguide
@@ -123,10 +124,10 @@ end
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
-    %focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
-    %    [-100,100],[1,1501],0,1000,1000,1.55,true);
-    focal_field=Focal_Slice(Dphase,T_list,atomPos,...
-    [-30,29],[-30,29],f,300,300,1.55,true); 
+    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
+        [-30,30],[1,101],0,600,1000,1.55,true);
+    %focal_field=Focal_Slice(Dphase,T_list,atomPos,...
+    %[-200,200],[-200,200],f,1000,1000,1.55,true); 
 end
 
 
