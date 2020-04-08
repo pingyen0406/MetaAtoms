@@ -39,50 +39,28 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-f = 100; % focal length
+f = 500; % focal length
 beta =5; % beta angle of axicon(in degree)
-lens_radius = 20; % radius or length of metalens
+lens_radius = 100; % radius or length of metalens
 N = floor(2*lens_radius/period); % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 atomPos = zeros(0,0);
 tmpPos = zeros(0,0);
-% creating a circular shape meta-atoms
-%{
-for i=0:0.5:360
-    for j=1:floor(N/2)
-        x_now = period*j;
-        if x_now < lens_radius     
-            [tmpPos(1,j),tmpPos(2,j)] = cart2pol(x_now,0);
-
-        end
-    end
-    rad_i = deg2rad(i);
-    
-    if i>0 && i<360
-        atomPos = cat(2,atomPos,[tmpPos(1,:)+rad_i;tmpPos(2,:)]);
-    elseif i==0
-        atomPos = tmpPos;
-    else
-        continue
-    end
-     
-end
-[atomPos(1,:),atomPos(2,:)] = pol2cart(atomPos(1,:),atomPos(2,:));
-atomPos = cat(2,[0;0],atomPos);
-%}
-for i=0:N
-    for j=0:N
-        x_now = period*(i-floor(N/2));
-        y_now = period*(j-floor(N/2));
+% Creating circular shape metalens
+for i=0:floor(N/2)    
+    for j=0:floor(N/2)
+        x_now = period*i;
+        y_now = period*j;
         if x_now^2+y_now^2 < lens_radius^2
-            
             atomPos=cat(2,atomPos,[x_now;y_now]);
         else
             continue
         end               
     end
 end
+atomPos = cat(2,atomPos,[-atomPos(1,2:end);atomPos(2,2:end)],...
+    [-atomPos(1,2:end);-atomPos(2,2:end)],[atomPos(1,2:end);-atomPos(2,2:end)]);
 %}
 % creating a square shape metalens   
 %{
@@ -93,8 +71,8 @@ for i=0:floor(N/2)
         atomPos=cat(2,atomPos,[x_now;y_now]);     
     end
 end
-atomPos = cat(2,atomPos,[-atomPos(1,:);atomPos(2,:)],[-atomPos(1,:);-atomPos(2,:)],...
-    [atomPos(1,:);-atomPos(2,:)]);
+atomPos = cat(2,atomPos,[-atomPos(1,2:end);atomPos(2,2:end)],...
+    [-atomPos(1,2:end);-atomPos(2,2:end)],[atomPos(1,2:end);-atomPos(2,2:end)]);
 %}
 
 
@@ -145,12 +123,10 @@ end
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
-    %focal_field=Focal_Slice_2(Dphase,T_list,atomPos,...
-    %[-30,29],[-30,29],50,300,300,1.55,true);
     %focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
     %    [-100,100],[1,1501],0,1000,1000,1.55,true);
-    focal_field2=Focal_Slice(Dphase,T_list,atomPos,...
-    [-30,29],[-30,29],50,300,300,1.55,true); 
+    focal_field=Focal_Slice(Dphase,T_list,atomPos,...
+    [-30,29],[-30,29],f,300,300,1.55,true); 
 end
 
 

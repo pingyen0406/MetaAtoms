@@ -36,7 +36,7 @@ if symmetry==false
     xlabel('x');ylabel('y');
       
 elseif symmetry==true  
-    field = Focal_Slice_2(Phase,T,atomPos,x_range,y_range,z,x_res,y_res,lambda);  
+    field = Focal_Rotate(Phase,T,atomPos,x_range,y_range,z,x_res,y_res,lambda);  
      
 else
     error("Wrong input on symmetry");

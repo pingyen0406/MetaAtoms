@@ -18,6 +18,7 @@ type = "focal";
 % And then transforming it into polar system and rotating it.
 % After thet, transforming it back to cartesian system.
 % Then doing some data fitting in order to plot the result.
+
 tmp_field(1,:) = linspace(0,max(x_range),floor(x_res/2));
 tmp_field(2,:)=zeros(1,length(tmp_field(1,:)));
 tmp_field(3,:) = pointSource_field(Phase,T,atomPos,tmp_field(1,:),...
@@ -41,7 +42,8 @@ x_max = max(field(1,:));
 y_min = min(field(2,:));
 y_max = max(field(2,:));
 
-F = scatteredInterpolant(field(1,:)',field(2,:)',field(3,:)');
+% Using a interpolation model in order to plot the field distribution.
+F = scatteredInterpolant(field(1,:)',field(2,:)',field(3,:)','natural','none');
 [xq,yq] = meshgrid(x_min:((x_max-x_min)/x_res):x_max,...
     y_min:((y_max-y_min)/y_res):y_max);
 zq = F(xq,yq);
