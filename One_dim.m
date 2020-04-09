@@ -1,15 +1,15 @@
 clear all;close all
 % For Linux path
-%folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-%addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
+folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
 % For Windows path
-folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
+%folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+%addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
-outputlist = false;
-outputname = [folder_path,'spherical1200.txt'];
-plot_field = true;
+outputlist = true;
+outputname = [folder_path,'spherical1200_prop.txt'];
+plot_field = false;
 
 % Read data from S4
 % (i,j) is 500+10*i nm height and 100+1*j nm radius
