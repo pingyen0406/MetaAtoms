@@ -47,36 +47,14 @@ neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 atomPos = zeros(0,0);
 tmpPos = zeros(0,0);
-% Creating circular shape metalens
-%{
-for i=0:floor(N/2)    
-    for j=0:floor(N/2)
-        x_now = period*i;
-        y_now = period*j;
-        if x_now^2+y_now^2 < lens_radius^2
-            atomPos=cat(2,atomPos,[x_now;y_now]);
-        else
-            continue
-        end               
-    end
-end
-atomPos = cat(2,atomPos,[-atomPos(1,2:end);atomPos(2,2:end)],...
-    [-atomPos(1,2:end);-atomPos(2,2:end)],[atomPos(1,2:end);-atomPos(2,2:end)]);
-%}
-% creating a square shape metalens   
 
-for i=0:floor(N/2)
-    for j=0:floor(N/2)
-        x_now = period*(i-floor(N/2));
-        y_now = period*(j-floor(N/2));
-        atomPos=cat(2,atomPos,[x_now;y_now]);     
-    end
-end
-atomPos = cat(2,atomPos,[-atomPos(1,2:end);atomPos(2,2:end)],...
-    [-atomPos(1,2:end);-atomPos(2,2:end)],[atomPos(1,2:end);-atomPos(2,2:end)]);
-%}
+atomPos = squarePos("circle",period,lens_radius);
+atomPos2 = squarePos("square",period,3);
 
-
+figure;
+scatter(atomPos(1,:),atomPos(2,:),'filled');
+figure;
+scatter(atomPos2(1,:),atomPos2(2,:),'filled');
 %---------------------------- Test data-----------------------------------
 %{
 tic;
