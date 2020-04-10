@@ -1,15 +1,15 @@
-clear all;close all
+clear all;
 % For Linux path
-folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
+%folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+%addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
 % For Windows path
-%folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
-%addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
+folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
-outputlist = true;
+outputlist = false;
 outputname = [folder_path,'spherical1200_prop.txt'];
-plot_field = false;
+plot_field = true;
 
 % Read data from S4
 % (i,j) is 500+10*i nm height and 100+1*j nm radius
@@ -22,17 +22,23 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-beta = 31;% beta angle for axicon lens
+beta = 5;% beta angle for axicon lens
 f = 47.6; % focal length
-L = 56.2;
-N = floor(L/period); % number of meta-atoms
+L = 100; % array length (um)
+N = floor(L/period)+1; % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 atomPos = zeros(2,N);
 % crate x-position array of meta-atoms
 for i=1:N
-    x_now = i-floor(N/2)-1;
-    atomPos(1,i)=period*x_now;
+    if mod(N,2)~=0
+        x_now = i-floor(N/2)-1;
+        atomPos(1,i)=period*x_now;
+    else
+        x_now = i-floor(N/2);
+        atomPos(1,i)=period*x_now;
+        atomPos(1,i) = atomPos(1,i)-0.5*period;
+    end
     
 end 
 %---------------------------- Test data-------------------------------
@@ -60,30 +66,32 @@ T = T(1,start_index:stop_index);
 R_list = R_list(1,start_index:stop_index);
 
 % Taking propagation phase into consideration 
-delay_phase = PropCorrect(length(atomPos),period,neff,wavelength);
-delay_phase = NorPhase(delay_phase);
+%delay_phase = PropCorrect(length(atomPos),period,neff,wavelength);
+%delay_phase = NorPhase(delay_phase);
+
 tic;
+
 % Creating focusing phase profile and doing interpolation
-Dphase = SphericalOutput(delay_phase,f,[0,0],atomPos,1.55);
+
+%Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
+Dphase = axiconOutput(0,beta,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 
 % Simulating energy decay below the waveguide
 %{
-alpha = 0.5;% decay rate 
+alpha = 0.9;% decay rate 
 for i=1:N
-    T_list(1,i)=(1-alpha*i/N)*T_list(1,i);
+    T_list(1,i)=(1-alpha*(i-1)/N)*T_list(1,i);
 end
 %}
-%Dphase = repmat(Dphase,1,5);
-%T_list = repmat(T_list,1,5);
-%atomPos = cat(2,atomPos,[atomPos(1,:);atomPos(2,:)-2*period],[atomPos(1,:);atomPos(2,:)-1*period],...
-%   [atomPos(1,:);atomPos(2,:)+period],[atomPos(1,:);atomPos(2,:)+2*period]);
+
+
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
     focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
-        [-30,29],[1,100],0,600,1000,1.55,false);
-    focal_field=Focal_Slice(Dphase,T_list,atomPos,...
-    [-30,29],[-30,29],f,600,600,1.55,false); 
+        [-50,50],[101,1001],0,1000,1000,1.55,false);
+    %focal_field=Focal_Slice(Dphase,T_list,atomPos,...
+    %[-30,29],[-30,29],f,600,600,1.55,false); 
 end
 
 % Output List

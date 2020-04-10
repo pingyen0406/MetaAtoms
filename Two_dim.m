@@ -24,7 +24,7 @@ folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
 addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
-outputlist = true;
+outputlist = false;
 outputname = [folder_path,'axicon1200.txt'];
 plot_field = true;
 
@@ -39,22 +39,17 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-f = 10000; % focal length
-beta =31; % beta angle of axicon(in degree)
-lens_radius = 28.1; % radius or length of metalens
-N = floor(2*lens_radius/period); % number of meta-atoms
+f = 60; % focal length
+beta =16.7; % beta angle of axicon(in degree)
+size = 20; % radius or length of metalens (circle or square)
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
-atomPos = zeros(0,0);
 tmpPos = zeros(0,0);
 
-atomPos = squarePos("circle",period,lens_radius);
-atomPos2 = squarePos("square",period,3);
+%atomPos = squarePos("circle",[0,0],period,lens_radius);
+atomPos = squarePos("square",[0,0],period,size);
 
-figure;
-scatter(atomPos(1,:),atomPos(2,:),'filled');
-figure;
-scatter(atomPos2(1,:),atomPos2(2,:),'filled');
+
 %---------------------------- Test data-----------------------------------
 %{
 tic;
@@ -85,27 +80,33 @@ T = T(1,start_index:stop_index);
 R_list = R_list(1,start_index:stop_index);
 
 % Taking propagation phase into consideration 
-delay_phase = PropCorrect(length(atomPos),period,neff,wavelength);
-delay_phase = NorPhase(delay_phase);
+%delay_phase = PropCorrect(length(atomPos),period,neff,wavelength);
+%delay_phase = NorPhase(delay_phase);
+
 tic;
 % Creating focusing phase profile and doing interpolation
-Dphase = axiconOutput(delay_phase,beta,[0,0],atomPos,1.55);
+%Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
+Dphase = axiconOutput(0,beta,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 
 % Simulating energy decay below the waveguide
-%{
+N = floor(size/period);
 alpha = 0.5;% decay rate 
-for i=1:N
-    T_list(1,i)=(1-alpha*i/N)*T_list(1,i);
+count=1;
+for i=1:N+1
+    for j=1:N+1
+        T_list(1,count)=(1-alpha*(i-1)/N)*T_list(1,count);
+        count=count+1;
+    end
 end
 %}
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
     focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
-        [-30,30],[1,101],0,600,1000,1.55,true);
+        [-30,30],[1,101],0,600,500,1.55,false);
     %focal_field=Focal_Slice(Dphase,T_list,atomPos,...
-    %[-200,200],[-200,200],f,1000,1000,1.55,true); 
+    %[-30,30],[-30,30],f,600,600,1.55,false); 
 end
 
 
@@ -118,7 +119,11 @@ if outputlist==true
     fclose(outf);
 end
 toc;
+
+
+
 % Check the Radius and Transmission distribution
+
 %figure;
 %scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
 %title("Transmission distribution");

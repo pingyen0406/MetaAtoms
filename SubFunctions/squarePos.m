@@ -1,7 +1,8 @@
-function atomPos = squarePos(type,period,size)
+function atomPos = squarePos(type,midPoint,period,size)
 % Generating x,y position of square lattice at given period and size.
 % Input:
 % type: Define shape of the lens. Can be either"circle" or "rect".
+% midPoint: middle point of the lens, [x,y]
 % size: "circle" -> radius; "square" -> [width,height]
 % Output: 2*N array
 
@@ -48,6 +49,9 @@ elseif type=="square"
 else
     error('Wrong input shape');
 end
+atomPos = atomPos+[midpoint(1);midPoint(2)];
+atomPos = sortrows(atomPos')';
+
 end
 
 % For odd numbers, we need to take those either x or y=0 into account.
