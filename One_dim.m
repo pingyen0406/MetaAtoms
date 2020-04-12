@@ -22,14 +22,22 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-beta = 5;% beta angle for axicon lens
+beta = 20; % beta angle for axicon lens
 f = 47.6; % focal length
-L = 100; % array length (um)
+L = 56.1; % array length (um)
 N = floor(L/period)+1; % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 atomPos = zeros(2,N);
-% crate x-position array of meta-atoms
+decay =true;
+decay_rate = 0.5;
+x_range = [-30, 30];
+x_res = 600;
+y_range = [-30, 30];
+y_res = 600;
+z_range = [40, 55];
+z_res = 500;
+% crate 1D position array of meta-atoms
 for i=1:N
     if mod(N,2)~=0
         x_now = i-floor(N/2)-1;
@@ -40,7 +48,11 @@ for i=1:N
         atomPos(1,i) = atomPos(1,i)-0.5*period;
     end
     
-end 
+end
+
+%atomPos = cat(2,[atomPos(1,:);atomPos(2,:)-6*period],[atomPos(1,:);atomPos(2,:)-5*period],[atomPos(1,:);atomPos(2,:)-4*period],[atomPos(1,:);atomPos(2,:)-3*period],[atomPos(1,:);atomPos(2,:)-2*period],[atomPos(1,:);atomPos(2,:)-1*period],...
+%    atomPos,[atomPos(1,:);atomPos(2,:)+period],[atomPos(1,:);atomPos(2,:)+2*period],[atomPos(1,:);atomPos(2,:)+3*period],[atomPos(1,:);atomPos(2,:)+4*period],[atomPos(1,:);atomPos(2,:)+5*period],[atomPos(1,:);atomPos(2,:)+6*period]);
+
 %---------------------------- Test data-------------------------------
 %{
 test_name = 'perfectAtom.txt';
@@ -73,25 +85,32 @@ tic;
 
 % Creating focusing phase profile and doing interpolation
 
-%Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
-Dphase = axiconOutput(0,beta,[0,0],atomPos,1.55);
+Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
+%Dphase = axiconOutput(0,beta,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 
 % Simulating energy decay below the waveguide
-%{
-alpha = 0.9;% decay rate 
-for i=1:N
-    T_list(1,i)=(1-alpha*(i-1)/N)*T_list(1,i);
+if decay==true 
+    for i=1:N
+        T_list(1,i)=(1-decay_rate*(i-1)/N)*T_list(1,i);
+    end
 end
 %}
 
+% Check the Transmission and phase distribution
+figure;
+scatter(atomPos(1,:),T_list,'filled');
+title("Transmission distribution");
+figure;
+scatter(atomPos(1,:),Dphase,'filled');
+title("Phase distribution");
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
     focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
-        [-50,50],[101,1001],0,1000,1000,1.55,false);
+        x_range,z_range,0,x_res,z_res,1.55,false);
     %focal_field=Focal_Slice(Dphase,T_list,atomPos,...
-    %[-30,29],[-30,29],f,600,600,1.55,false); 
+    %x_range,y_range,f,x_res,y_res,1.55,false); 
 end
 
 % Output List
@@ -103,9 +122,6 @@ if outputlist==true
     fclose(outf);
 end
 toc;
-% Check the Radius and Transmission distribution
-figure;
-scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
-title("Transmission distribution");
+
 
 

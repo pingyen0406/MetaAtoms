@@ -49,7 +49,7 @@ elseif type=="square"
 else
     error('Wrong input shape');
 end
-atomPos = atomPos+[midpoint(1);midPoint(2)];
+atomPos = atomPos+[midPoint(1);midPoint(2)];
 atomPos = sortrows(atomPos')';
 
 end

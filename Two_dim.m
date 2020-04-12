@@ -15,7 +15,7 @@
 
 
 
-clear all; close all;
+clear all;
 % Linux path
 %folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
 %addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
@@ -40,11 +40,18 @@ R_list = [0.03:0.002:0.248];
 % Parameters
 period = 0.562;
 f = 60; % focal length
-beta =16.7; % beta angle of axicon(in degree)
+beta =15; % beta angle of axicon(in degree)
 size = 20; % radius or length of metalens (circle or square)
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
-tmpPos = zeros(0,0);
+decay = true;
+decay_rate = 0.5;
+x_range = [-30, 30];
+x_res = 600;
+y_range = [-30, 30];
+y_res = 600;
+z_range = [10, 500];
+z_res = 500;
 
 %atomPos = squarePos("circle",[0,0],period,lens_radius);
 atomPos = squarePos("square",[0,0],period,size);
@@ -90,23 +97,33 @@ Dphase = axiconOutput(0,beta,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 
 % Simulating energy decay below the waveguide
-N = floor(size/period);
-alpha = 0.5;% decay rate 
-count=1;
-for i=1:N+1
-    for j=1:N+1
-        T_list(1,count)=(1-alpha*(i-1)/N)*T_list(1,count);
-        count=count+1;
+if decay==true
+    N = floor(size/period);
+    count=1;
+    for i=1:N+1
+        for j=1:N+1
+            T_list(1,count)=(1-decay_rate*(i-1)/N)*T_list(1,count);
+            count=count+1;
+        end
     end
 end
-%}
+
+
+% Check the Radius and Transmission distribution
+figure;
+scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
+title("Transmission distribution");
+figure;
+scatter3(atomPos(1,:),atomPos(2,:),Dphase,'filled');
+title("Phase distribution");
+
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_field==true
     focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
-        [-30,30],[1,101],0,600,500,1.55,false);
+        x_range,z_range,0,x_res,z_res,1.55,false);
     %focal_field=Focal_Slice(Dphase,T_list,atomPos,...
-    %[-30,30],[-30,30],f,600,600,1.55,false); 
+    %x_range,y_range,f,x_res,y_res,1.55,false); 
 end
 
 
@@ -122,14 +139,7 @@ toc;
 
 
 
-% Check the Radius and Transmission distribution
 
-%figure;
-%scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
-%title("Transmission distribution");
-%figure;
-%scatter3(atomPos(1,:),atomPos(2,:),R_list,'filled');
-%title("Transmission distribution");
 
 
 
