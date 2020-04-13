@@ -3,7 +3,7 @@ clear all;
 %folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
 %addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
 % For Windows path
-folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/40nmAl2O3/';
 addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
@@ -22,36 +22,23 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-beta = 20; % beta angle for axicon lens
+beta = 10; % beta angle for axicon lens
 f = 47.6; % focal length
 L = 56.1; % array length (um)
 N = floor(L/period)+1; % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 atomPos = zeros(2,N);
-decay =true;
+decay =false;
 decay_rate = 0.5;
-x_range = [-30, 30];
+x_range = [-50, 50];
 x_res = 600;
-y_range = [-30, 30];
+y_range = [-50, 50];
 y_res = 600;
-z_range = [40, 55];
+z_range = [11, 301];
 z_res = 500;
-% crate 1D position array of meta-atoms
-for i=1:N
-    if mod(N,2)~=0
-        x_now = i-floor(N/2)-1;
-        atomPos(1,i)=period*x_now;
-    else
-        x_now = i-floor(N/2);
-        atomPos(1,i)=period*x_now;
-        atomPos(1,i) = atomPos(1,i)-0.5*period;
-    end
-    
-end
 
-%atomPos = cat(2,[atomPos(1,:);atomPos(2,:)-6*period],[atomPos(1,:);atomPos(2,:)-5*period],[atomPos(1,:);atomPos(2,:)-4*period],[atomPos(1,:);atomPos(2,:)-3*period],[atomPos(1,:);atomPos(2,:)-2*period],[atomPos(1,:);atomPos(2,:)-1*period],...
-%    atomPos,[atomPos(1,:);atomPos(2,:)+period],[atomPos(1,:);atomPos(2,:)+2*period],[atomPos(1,:);atomPos(2,:)+3*period],[atomPos(1,:);atomPos(2,:)+4*period],[atomPos(1,:);atomPos(2,:)+5*period],[atomPos(1,:);atomPos(2,:)+6*period]);
+
 
 %---------------------------- Test data-------------------------------
 %{
@@ -77,16 +64,30 @@ Phase = Truncated_Phase(Phase,start_index,stop_index);
 T = T(1,start_index:stop_index);
 R_list = R_list(1,start_index:stop_index);
 
-% Taking propagation phase into consideration 
+% crate 1D position array of meta-atoms
+for i=1:N
+    if mod(N,2)~=0
+        x_now = i-floor(N/2)-1;
+        atomPos(1,i)=period*x_now;
+    else
+        x_now = i-floor(N/2);
+        atomPos(1,i)=period*x_now;
+        atomPos(1,i) = atomPos(1,i)-0.5*period;
+    end
+    
+end
+
+% Taking propagation phase into consideration
 %delay_phase = PropCorrect(length(atomPos),period,neff,wavelength);
 %delay_phase = NorPhase(delay_phase);
 
 tic;
 
-% Creating focusing phase profile and doing interpolation
 
-Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
-%Dphase = axiconOutput(0,beta,[0,0],atomPos,1.55);
+
+% Creating focusing phase profile and doing interpolation
+%Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
+Dphase = axiconOutput(0,beta,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 
 % Simulating energy decay below the waveguide
