@@ -22,20 +22,20 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-beta = 10; % beta angle for axicon lens
-f = 47.6; % focal length
-L = 56.1; % array length (um)
+beta = 5; % beta angle for axicon lens
+f = 2000; % focal length
+L = 56.2; % array length (um)
 N = floor(L/period)+1; % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 atomPos = zeros(2,N);
-decay =false;
+decay =true;
 decay_rate = 0.5;
-x_range = [-50, 50];
-x_res = 600;
-y_range = [-50, 50];
-y_res = 600;
-z_range = [11, 301];
+x_range = [-75, 75];
+x_res = 250;
+y_range = [-75, 75];
+y_res = 250;
+z_range = [10, 1500];
 z_res = 500;
 
 

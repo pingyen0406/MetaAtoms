@@ -20,7 +20,7 @@ clear all;
 %folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
 %addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
 % Windows path
-folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
+folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/40nmAl2O3/';
 addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
@@ -39,24 +39,26 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-f = 60; % focal length
-beta =15; % beta angle of axicon(in degree)
+f = 500; % focal length
+beta =5; % beta angle of axicon(in degree)
 size = 20; % radius or length of metalens (circle or square)
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 decay = true;
 decay_rate = 0.5;
-x_range = [-30, 30];
-x_res = 600;
-y_range = [-30, 30];
-y_res = 600;
-z_range = [10, 500];
+x_range = [-100, 100];
+x_res = 250;
+y_range = [-100, 100];
+y_res = 250;
+z_range = [10, 1500];
 z_res = 500;
 
 %atomPos = squarePos("circle",[0,0],period,lens_radius);
 atomPos = squarePos("square",[0,0],period,size);
-
-
+N = sqrt(length(atomPos));
+diff = [ones(1,N*N)*N*period;zeros(1,N*N)];
+atomPos = cat(2,atomPos-diff,atomPos,atomPos+diff);
+scatter(atomPos(1,:),atomPos(2,:));
 %---------------------------- Test data-----------------------------------
 %{
 tic;
@@ -68,8 +70,10 @@ test_Phase = NorPhase(transpose(test_f(:,3)));
 test_Phase(1,end)=0;
 Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,test_Phase,test_T,test_r);
-focal_field=Focal_Slice(Dphase,T_list,atomPos,[-25,25],[-25,25],f,100,100,1.55);
-focusing_field=Focusing_Slice(Dphase,T_list,atomPos,[-25,25],[1,201],0,100,2000,1.55);
+focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
+        x_range,z_range,0,x_res,z_res,1.55,true);
+focal_field=Focal_Slice(Dphase,T_list,atomPos,...
+    x_range,y_range,f,x_res,y_res,1.55,true); 
 toc;
 %}
 %--------------------------------------------------------------------------
@@ -80,7 +84,7 @@ toc;
 Phase=NorPhase(Phase);
 %%%%%%%%% Set an breakpoint this line to check the phase data.%%%%%%%
 
-start_index=35;
+start_index=28;
 stop_index=79;
 Phase = Truncated_Phase(Phase,start_index,stop_index);
 T = T(1,start_index:stop_index);
@@ -92,18 +96,21 @@ R_list = R_list(1,start_index:stop_index);
 
 tic;
 % Creating focusing phase profile and doing interpolation
-%Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
-Dphase = axiconOutput(0,beta,[0,0],atomPos,1.55);
+Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
+%Dphase = axiconOutput(0,beta,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 
 % Simulating energy decay below the waveguide
 if decay==true
-    N = floor(size/period);
+    N_l = length(atomPos)/N;
     count=1;
-    for i=1:N+1
-        for j=1:N+1
-            T_list(1,count)=(1-decay_rate*(i-1)/N)*T_list(1,count);
+    for i=1:N_l
+        for j=1:N
+            T_list(1,count)=(1-decay_rate*(i-1)/N_l)*T_list(1,count);
             count=count+1;
+        end
+        if count>N_l*N
+            break
         end
     end
 end
@@ -122,8 +129,8 @@ title("Phase distribution");
 if plot_field==true
     focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
         x_range,z_range,0,x_res,z_res,1.55,false);
-    %focal_field=Focal_Slice(Dphase,T_list,atomPos,...
-    %x_range,y_range,f,x_res,y_res,1.55,false); 
+    focal_field=Focal_Slice(Dphase,T_list,atomPos,...
+    x_range,y_range,f,x_res,y_res,1.55,false); 
 end
 
 
