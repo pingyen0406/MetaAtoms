@@ -23,7 +23,7 @@ R_list = [0.03:0.002:0.248];
 % Parameters
 period = 0.562;
 beta = 5; % beta angle for axicon lens
-f = 2000; % focal length
+f = 200; % focal length
 L = 56.2; % array length (um)
 N = floor(L/period)+1; % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
@@ -35,22 +35,41 @@ x_range = [-75, 75];
 x_res = 250;
 y_range = [-75, 75];
 y_res = 250;
-z_range = [10, 1500];
+z_range = [50, 500];
 z_res = 500;
 
 
 
 %---------------------------- Test data-------------------------------
 %{
+for i=1:N
+    if mod(N,2)~=0
+        x_now = i-floor(N/2)-1;
+        atomPos(1,i)=period*x_now;
+    else
+        x_now = i-floor(N/2);
+        atomPos(1,i)=period*x_now;
+        atomPos(1,i) = atomPos(1,i)-0.5*period;
+    end
+    
+end
+tic;
 test_name = 'perfectAtom.txt';
 test_f = readmatrix(test_name);
 test_r = transpose(test_f(:,1));
 test_T = transpose(test_f(:,2));
-test_Phase = transpose(test_f(:,3));
-tt = NorPhase(test_Phase);
-[sphericalList,Dphase] = SphericalOutput(test_Phase,test_T,test_r,f,lattice,N,1.55);
-amp_list = interp1(test_r,test_T,sphericalList);
-Field=Eatom(Dphase,amp_list,atomPos,[0,60],[1,20],0,1200,400,1.55);
+test_Phase = NorPhase(transpose(test_f(:,3)));
+test_Phase(1,end)=0;
+Dphase = SphericalOutput(0,Phase,f,[0,0],atomPos,1.55);
+%Dphase = axiconOutput(0,Phase,beta,[0,0],atomPos,1.55);
+[R_list,T_list]=Interpolation(Dphase,test_Phase,test_T,test_r);
+pd = makedist('Normal','mu',0,'sigma',20);
+T_list = pdf(pd,linspace(-30,30,length(R_list)));
+focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
+        x_range,z_range,0,x_res,z_res,1.55,false);
+focal_field=Focal_Slice(Dphase,T_list,atomPos,...
+    x_range,y_range,f,x_res,y_res,1.55,false); 
+toc;
 %}
 %-----------------------------------------------------------------------
 
@@ -58,7 +77,7 @@ tic;
 % Choosing desired part of phase data
 Phase=NorPhase(Phase);
 % Set an breakpoint this line to check the phase data.
-start_index=35;
+start_index=28;
 stop_index=79;
 Phase = Truncated_Phase(Phase,start_index,stop_index);
 T = T(1,start_index:stop_index);
@@ -86,8 +105,8 @@ tic;
 
 
 % Creating focusing phase profile and doing interpolation
-%Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
-Dphase = axiconOutput(0,beta,[0,0],atomPos,1.55);
+Dphase = SphericalOutput(0,Phase,f,[0,0],atomPos,1.55);
+%Dphase = axiconOutput(0,Phase,beta,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 
 % Simulating energy decay below the waveguide
@@ -110,8 +129,8 @@ title("Phase distribution");
 if plot_field==true
     focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
         x_range,z_range,0,x_res,z_res,1.55,false);
-    %focal_field=Focal_Slice(Dphase,T_list,atomPos,...
-    %x_range,y_range,f,x_res,y_res,1.55,false); 
+    focal_field=Focal_Slice(Dphase,T_list,atomPos,...
+    x_range,y_range,f,x_res,y_res,1.55,false); 
 end
 
 % Output List
