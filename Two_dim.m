@@ -42,27 +42,27 @@ R_list = [0.03:0.002:0.248];
 period = 0.562;
 lens_type = "spherical"; % "axicon" or "spherical"
 size = 20;
-0; % radius or length of metalens (circle or square)
-f_num = 2;
-f = f_num*size; % focal length
-center=[0,0]; % center of the lens
+% 'Radius' or 'Length' of metalens (circle or square)
+f_num = 3.5; % f-number
+f = 180; % focal length
+center=[30,0]; % middle point of the pattern
 beta =1; % beta angle of axicon(in degree)
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
-decay = false;
+decay = true;
 decay_rate = 0.5;
-x_range = [-50,50];
-x_res = 200;
-y_range = [-50,50];
-y_res = 200;
-z_range = [10, 60];
-z_res = 200;
+x_range = [-75,75];
+x_res = 300;
+y_range = [-75,75];
+y_res = 300;
+z_range = [10,250];
+z_res = 500;
 
 %atomPos = squarePos("circle",[0,0],period,size/2);
 atomPos = squarePos("square",[0,0],period,size);
 N = sqrt(length(atomPos));
 diff = [ones(1,N*N)*N*period;zeros(1,N*N)];
-%atomPos = cat(2,atomPos-diff,atomPos,atomPos+diff);
+atomPos = cat(2,atomPos-diff,atomPos,atomPos+diff);
 %---------------------------- Test data-----------------------------------
 %{
 tic;
@@ -135,13 +135,17 @@ title("Phase distribution");
 
 
 % Calculating the field and plot it out.(real, imag, and abs)
-if plot_focalField==true
-    focal_field=Focal_Slice(Dphase,T_list,atomPos,...
-    x_range,y_range,f,x_res,y_res,1.55,false); 
-end
 if plot_focusingField==true
    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
         x_range,z_range,0,x_res,z_res,1.55,false);
+end
+% Find the maximum value and plot the focal slice
+[a,b]=max(max(abs(focusing_field)));
+focal_z = z_range(1)+b*(z_range(2)-z_range(1))/z_res;
+
+if plot_focalField==true
+    focal_field=Focal_Slice(Dphase,T_list,atomPos,...
+    x_range,y_range,focal_z,x_res,y_res,1.55,false); 
 end
 
 % Output radius list
@@ -154,8 +158,7 @@ if outputlist==true
 end
 toc;
 
-[a,b]=max(max(abs(focusing_field)));
-focal_z = z_range(1)+b*(z_range(2)-z_range(1))/z_res;
+
 
 
 

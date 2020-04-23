@@ -31,16 +31,16 @@ elseif symmetry == true
 else
     error("Wrong input on symmetry");
 end
-figure;
-colormap('jet');
-image(z_list,x_list,real(field),'CDataMapping','scaled');
-title(['real part at y=',num2str(y),'um']);
-xlabel('z');ylabel('x');
-figure;
-colormap('jet');
-image(z_list,x_list,imag(field),'CDataMapping','scaled');
-title(['imag part at y=',num2str(y),'um']);
-xlabel('z');ylabel('x');
+% figure;
+% colormap('jet');
+% image(z_list,x_list,real(field),'CDataMapping','scaled');
+% title(['real part at y=',num2str(y),'um']);
+% xlabel('z');ylabel('x');
+% figure;
+% colormap('jet');
+% image(z_list,x_list,imag(field),'CDataMapping','scaled');
+% title(['imag part at y=',num2str(y),'um']);
+% xlabel('z');ylabel('x');
 figure;
 colormap('jet');
 image(z_list,x_list,abs(field),'CDataMapping','scaled');

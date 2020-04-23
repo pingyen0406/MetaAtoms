@@ -19,16 +19,16 @@ if symmetry==false
     field = pointSource_field(Phase,T,atomPos,x_list,y_list,z,lambda,type);
     
     field = field';
-    figure;
-    colormap('jet');
-    image(x_list,y_list,real(field),'CDataMapping','scaled');
-    title(['real part at z=',num2str(z),'um']);
-    xlabel('x');ylabel('y');
-    figure;
-    colormap('jet');
-    image(x_list,y_list,imag(field),'CDataMapping','scaled');
-    title(['imag part at z=',num2str(z),'um']);
-    xlabel('x');ylabel('y');
+%     figure;
+%     colormap('jet');
+%     image(x_list,y_list,real(field),'CDataMapping','scaled');
+%     title(['real part at z=',num2str(z),'um']);
+%     xlabel('x');ylabel('y');
+%     figure;
+%     colormap('jet');
+%     image(x_list,y_list,imag(field),'CDataMapping','scaled');
+%     title(['imag part at z=',num2str(z),'um']);
+%     xlabel('x');ylabel('y');
     figure;
     colormap('jet');
     image(x_list,y_list,abs(field),'CDataMapping','scaled');
