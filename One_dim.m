@@ -8,7 +8,7 @@ addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
 outputlist = false;
-outputname = [folder_path,'spherical1200_prop.txt'];
+outputname = [folder_path,'axicon_25.txt'];
 plot_field = true;
 
 % Read data from S4
@@ -22,21 +22,22 @@ R_list = [0.03:0.002:0.248];
 
 % Parameters
 period = 0.562;
-beta = 5; % beta angle for axicon lens
+beta = 25; % beta angle for axicon lens
 f = 200; % focal length
 L = 56.2; % array length (um)
 N = floor(L/period)+1; % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 atomPos = zeros(2,N);
+phase_delay=false;
 decay =true;
-decay_rate = 0.5;
-x_range = [-75, 75];
-x_res = 250;
-y_range = [-75, 75];
-y_res = 250;
-z_range = [50, 500];
-z_res = 500;
+decay_rate = 0.7;
+x_range = [-30, 30];
+x_res = 1000;
+y_range = [-30, 30];
+y_res = 2000;
+z_range = [1, 60];
+z_res = 2000;
 
 
 
@@ -77,7 +78,7 @@ tic;
 % Choosing desired part of phase data
 Phase=NorPhase(Phase);
 % Set an breakpoint this line to check the phase data.
-start_index=28;
+start_index=35;
 stop_index=79;
 Phase = Truncated_Phase(Phase,start_index,stop_index);
 T = T(1,start_index:stop_index);
@@ -97,16 +98,21 @@ for i=1:N
 end
 
 % Taking propagation phase into consideration
-%delay_phase = PropCorrect(length(atomPos),period,neff,wavelength);
-%delay_phase = NorPhase(delay_phase);
+if phase_delay==true
+    delay_phase = PropCorrect(length(atomPos),period,neff,wavelength);
+    delay_phase = NorPhase(delay_phase);
+else
+    delay_phase=0;
+end
+
 
 tic;
 
 
 
 % Creating focusing phase profile and doing interpolation
-Dphase = SphericalOutput(0,Phase,f,[0,0],atomPos,1.55);
-%Dphase = axiconOutput(0,Phase,beta,[0,0],atomPos,1.55);
+%Dphase = SphericalOutput(0,Phase,f,[0,0],atomPos,1.55);
+Dphase = axiconOutput(delay_phase,Phase,beta,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 
 % Simulating energy decay below the waveguide
@@ -129,8 +135,8 @@ title("Phase distribution");
 if plot_field==true
     focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
         x_range,z_range,0,x_res,z_res,1.55,false);
-    focal_field=Focal_Slice(Dphase,T_list,atomPos,...
-    x_range,y_range,f,x_res,y_res,1.55,false); 
+    %focal_field=Focal_Slice(Dphase,T_list,atomPos,...
+    %x_range,y_range,f,x_res,y_res,1.55,false); 
 end
 
 % Output List
