@@ -26,8 +26,8 @@ fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
 plot_focalField = false;
 plot_focusingField = false;
-outputlist = true;
-outputname = [folder_path,'focus_180_6.txt'];
+outputlist = false;
+outputname = [folder_path,'focus_180_1.txt'];
 
 % Read data from S4 calculation
 % (i,j) is 500+10*i nm height and 100+1*j nm radius
@@ -45,8 +45,8 @@ size = 20;
 % 'Radius' or 'Length' of metalens (circle or square)
 f_num = 3.5; % f-number
 f = 180; % focal length
-center=[30,0]; % middle point of the pattern
-beta =15; % beta angle of axicon(in degree)
+center=[0,0]; % middle point of the pattern
+beta =5; % beta angle of axicon(in degree)
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 phase_delay=true;
@@ -56,14 +56,16 @@ x_range = [-75,75];
 x_res = 300;
 y_range = [-75,75];
 y_res = 300;
-z_range = [10,500];
-z_res = 500;
+z_range = [10,300];
+z_res = 300;
 
 %atomPos = squarePos("circle",[0,0],period,size/2);
 atomPos = squarePos("square",[0,0],period,size);
 N = sqrt(length(atomPos));
 diff = [ones(1,N*N)*N*period;zeros(1,N*N)];
+% Use 3 squares to create a rectangle
 atomPos = cat(2,atomPos-diff,atomPos,atomPos+diff);
+
 %---------------------------- Test data-----------------------------------
 %{
 tic;
@@ -85,17 +87,19 @@ toc;
 
 
 
-% Choosing desired part of phase data
+% Normalize the input phase data
 Phase=NorPhase(Phase);
-%%%%%%%%% Set an breakpoint this line to check the phase data.%%%%%%%
-
+% Set an breakpoint this line to check the phase data.
+% Truncate the phase data at desired interval
 start_index=35;
 stop_index=79;
 Phase = Truncated_Phase(Phase,start_index,stop_index);
 T = T(1,start_index:stop_index);
 R_range = R_range(1,start_index:stop_index);
 
-% Taking propagation phase into consideration 
+% Taking propagation phase into consideration
+% Subtracting the phase due to propagation(equivalent to a plane wave under
+% the meta-atoms)
 if phase_delay==true
     count=1;
     delay_phase = zeros(1,length(atomPos));
@@ -112,25 +116,14 @@ else
     delay_phase=0;
 end
 
-tic;
 
+tic; % timer start
 
-    
-% Creating focusing phase profile and doing interpolation
-if lens_type=="axicon"
-    Dphase = axiconOutput(delay_phase,Phase,beta,center,atomPos,1.55);
-elseif lens_type=="spherical"
-    Dphase = SphericalOutput(delay_phase,Phase,f,center,atomPos,1.55);
-else
-    error("Wrong lens type");
-end
-% Do interpolation to find the corresponding radius and transmission data.
-[R_list,T_list]=Interpolation(Dphase,Phase,T,R_range);
-%}
-% loop of output list
+% Output multiple R_list at a time
 %{
-for f=100:10:300
-    outputname = [folder_path,'focus_',num2str(f),'.txt'];
+count=1;
+for center=[[-30;0],[-10;0],[10;0],[30;0]]
+    outputname = [folder_path,'focus_180_',num2str(count),'.txt'];
     Dphase = SphericalOutput(delay_phase,Phase,f,center,atomPos,1.55);
 % Do interpolation to find the corresponding radius and transmission data.
     [R_list,T_list]=Interpolation(Dphase,Phase,T,R_range);
@@ -140,8 +133,22 @@ for f=100:10:300
         fprintf(outf,'%f\n',R_list(i));
     end
     fclose(outf);
+    count=count+1;
 end
 %}
+    
+% Create the desired phase profile
+if lens_type=="axicon"
+    Dphase = axiconOutput(delay_phase,Phase,beta,center,atomPos,1.55);
+elseif lens_type=="spherical"
+    Dphase = SphericalOutput(delay_phase,Phase,f,center,atomPos,1.55);
+else
+    error("Wrong lens type");
+end
+% Do the interpolation to find the corresponding radius and transmission data.
+[R_list,T_list]=Interpolation(Dphase,Phase,T,R_range);
+
+
 
 % Output radius list
 if outputlist==true 
@@ -176,24 +183,26 @@ scatter3(atomPos(1,:),atomPos(2,:),Dphase,'filled');
 title("Phase distribution");
 
 
-
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_focusingField==true
    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
-        x_range,z_range,0,x_res,z_res,1.55,false);
-    % Find the maximum value and plot the focal slice
-    [a,b]=max(max(abs(focusing_field)));
-    focal_z = z_range(1)+b*(z_range(2)-z_range(1))/z_res;
+        x_range,z_range,0,x_res,z_res,wavelength,false);
+    
 end
-
-
 if plot_focalField==true
     focal_field=Focal_Slice(Dphase,T_list,atomPos,...
-    x_range,y_range,focal_z,x_res,y_res,1.55,false); 
+    x_range,y_range,focal_z,x_res,y_res,wavelength,false); 
 end
 
+% Find the maximum value from the focusing plot and show the focal slice of
+% the plane.
+%[a,b]=max(max(abs(focusing_field)));
+%focal_z = z_range(1)+b*(z_range(2)-z_range(1))/z_res;
+%focal_field=Focal_Slice(Dphase,T_list,atomPos,...
+%    x_range,y_range,focal_z,x_res,y_res,1.55,false); 
 
-toc;
+
+toc; %timer stop
 
 
 
