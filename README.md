@@ -1,3 +1,2 @@
-# MetaAtoms
-**Simulating metalens as the superposition of the point source**
-
+# Simulating metalens as the superposition of the point source
+*Usage*
