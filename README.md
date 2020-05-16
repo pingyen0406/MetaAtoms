@@ -9,4 +9,4 @@ The input data should have radius-transmission and radius-phase relations.
 4. Generate the designed phase profile and use interpolation to put corresponding meta-atom to each position
 5. Calculate the field by the transmission and initial phase data and plot it out
 
-One_dim.m and Two_dim.m correspond to 1-D and 2-D examples
+  One_dim.m and Two_dim.m correspond to 1-D and 2-D examples
