@@ -1,0 +1,14 @@
+clear all;
+fname = 'f_150.fig';
+folder_path = 'D:/Dropbox/Thesis/MATLAB/';
+fig = [folder_path,fname];
+inf = openfig(fig);
+C = gca;
+title('');
+xlabel('Distance (\mum)');
+ylabel('x (\mum)');
+yticks([-50,-25,0,25,50]);
+set(C,'FontSize',20);
+text(C,325,40,'f = 150\mum','FontSize',36,'FontWeight','bold','color','w');
+savefig([folder_path,fname]);
+saveas(gcf,[folder_path,'f_150.png']);

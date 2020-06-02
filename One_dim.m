@@ -23,7 +23,7 @@ R_list = [0.03:0.002:0.248];
 % Parameters
 period = 0.562;
 beta = 25; % beta angle for axicon lens
-f = 200; % focal length
+f = 47; % focal length
 L = 56.2; % array length (um)
 N = floor(L/period)+1; % number of meta-atoms
 neff = 2.858; % effective index derived from FDTD
@@ -35,9 +35,9 @@ decay_rate = 0.7;
 x_range = [-30, 30];
 x_res = 1000;
 y_range = [-30, 30];
-y_res = 2000;
+y_res = 1000;
 z_range = [1, 60];
-z_res = 2000;
+z_res = 1000;
 
 
 
@@ -111,8 +111,8 @@ tic;
 
 
 % Creating focusing phase profile and doing interpolation
-%Dphase = SphericalOutput(0,Phase,f,[0,0],atomPos,1.55);
-Dphase = axiconOutput(delay_phase,Phase,beta,[0,0],atomPos,1.55);
+Dphase = SphericalOutput(0,Phase,f,[0,0],atomPos,1.55);
+%Dphase = axiconOutput(delay_phase,Phase,beta,[0,0],atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_list);
 
 % Simulating energy decay below the waveguide

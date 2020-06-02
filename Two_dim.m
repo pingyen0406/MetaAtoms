@@ -16,18 +16,24 @@
 
 
 clear all;
+input=jsondecode(fileread('input.json'));
 % Linux path
 %folder_path = '/home/pingyen/Simulation/MATLAB/MetaAtoms/Lib562/60nmAl2O3/Al2O3_top/';
 %addpath("/home/pingyen/Simulation/MATLAB/MetaAtoms/SubFunctions/");
 % Windows path
-folder_path = 'D:/Dropbox/MATLAB/MetaAtoms/Lib562/40nmAl2O3/';
-addpath("D:/Dropbox/MATLAB/MetaAtoms/SubFunctions/");
+folder_path = input.folder_path;
+current_fol = pwd;
+addpath([current_fol,'\','SubFunctions\']);
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
-plot_focalField = false;
-plot_focusingField = false;
-outputlist = false;
-outputname = [folder_path,'focus_180_1.txt'];
+
+
+
+
+plot_focalField = input.plot_focalField;
+plot_focusingField = input.plot_focusingField;
+outputlist = input.outputlist;
+outputname = [folder_path,'Al2O3test_2.txt'];
 
 % Read data from S4 calculation
 % (i,j) is 500+10*i nm height and 100+1*j nm radius
@@ -39,25 +45,25 @@ Phase = all_Phase(height/10-50+1,:);
 R_range = [0.03:0.002:0.248];
 
 % Parameters
-period = 0.562;
-lens_type = "spherical"; % "axicon" or "spherical"
-size = 20;
+period = input.period;
+lens_type = input.lens_type; % "axicon" or "spherical"
+size = input.size;
 % 'Radius' or 'Length' of metalens (circle or square)
 f_num = 3.5; % f-number
-f = 180; % focal length
-center=[0,0]; % middle point of the pattern
+f = input.f; % focal length
+center=input.center; % middle point of the pattern
 beta =5; % beta angle of axicon(in degree)
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
-phase_delay=true;
-decay = true;
+phase_delay=input.phase_delay;
+decay = input.dacay;
 decay_rate = 0.5;
-x_range = [-75,75];
-x_res = 300;
-y_range = [-75,75];
-y_res = 300;
-z_range = [10,300];
-z_res = 300;
+x_range = input.x_range;
+x_res = input.x_res;
+y_range = input.y_range;
+y_res = input.y_res;
+z_range = input.z_range;
+z_res = input.z_res;
 
 %atomPos = squarePos("circle",[0,0],period,size/2);
 atomPos = squarePos("square",[0,0],period,size);
@@ -75,7 +81,7 @@ test_r = transpose(test_f(:,1));
 test_T = transpose(test_f(:,2));
 test_Phase = NorPhase(transpose(test_f(:,3)));
 test_Phase(1,end)=0;
-Dphase = SphericalOutput(0,f,[0,0],atomPos,1.55);
+Dphase = SphericalOutput(0,test_Phase,f,center,atomPos,1.55);
 [R_list,T_list]=Interpolation(Dphase,test_Phase,test_T,test_r);
 focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
         x_range,z_range,0,x_res,z_res,1.55,true);
@@ -175,12 +181,12 @@ if decay==true
 end
 
 % Check the Radius and Transmission distribution
-figure;
-scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
-title("Transmission distribution");
-figure;
-scatter3(atomPos(1,:),atomPos(2,:),Dphase,'filled');
-title("Phase distribution");
+%figure;
+%scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
+%title("Transmission distribution");
+%figure;
+%scatter3(atomPos(1,:),atomPos(2,:),Dphase,'filled');
+%title("Phase distribution");
 
 
 % Calculating the field and plot it out.(real, imag, and abs)
@@ -189,6 +195,9 @@ if plot_focusingField==true
         x_range,z_range,0,x_res,z_res,wavelength,false);
     
 end
+[a,b]=max(max(abs(focusing_field(:,100:end))));
+focal_z = z_range(1)+(b+100)*(z_range(2)-z_range(1))/z_res;
+
 if plot_focalField==true
     focal_field=Focal_Slice(Dphase,T_list,atomPos,...
     x_range,y_range,focal_z,x_res,y_res,wavelength,false); 
