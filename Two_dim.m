@@ -26,14 +26,10 @@ current_fol = pwd;
 addpath([current_fol,'\','SubFunctions\']);
 fname_T = [folder_path,'SweepT562.txt'];
 fname_Phase = [folder_path,'SweepPhase562.txt'];
-
-
-
-
 plot_focalField = input.plot_focalField;
 plot_focusingField = input.plot_focusingField;
 outputlist = input.outputlist;
-outputname = [folder_path,'Al2O3test_2.txt'];
+outputname = [input.output_path,'grating_27.txt'];
 
 % Read data from S4 calculation
 % (i,j) is 500+10*i nm height and 100+1*j nm radius
@@ -51,6 +47,7 @@ size = input.size;
 % 'Radius' or 'Length' of metalens (circle or square)
 f_num = 3.5; % f-number
 f = input.f; % focal length
+gt_angle = input.gt_angle; % grating angle
 center=input.center; % middle point of the pattern
 beta =5; % beta angle of axicon(in degree)
 neff = 2.858; % effective index derived from FDTD
@@ -148,12 +145,16 @@ if lens_type=="axicon"
     Dphase = axiconOutput(delay_phase,Phase,beta,center,atomPos,1.55);
 elseif lens_type=="spherical"
     Dphase = SphericalOutput(delay_phase,Phase,f,center,atomPos,1.55);
+elseif lens_type=="grating"
+    Dphase = gratingOutput(delay_phase,Phase,gt_angle,period,neff,atomPos,1.55);
+elseif lens_type=="None"
+    Dphase = zeros(1,length(atomPos));
 else
     error("Wrong lens type");
 end
 % Do the interpolation to find the corresponding radius and transmission data.
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_range);
-
+T_list = ones(1,length(atomPos));
 
 
 % Output radius list
@@ -181,12 +182,12 @@ if decay==true
 end
 
 % Check the Radius and Transmission distribution
-%figure;
-%scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
-%title("Transmission distribution");
-%figure;
-%scatter3(atomPos(1,:),atomPos(2,:),Dphase,'filled');
-%title("Phase distribution");
+figure;
+scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
+title("Transmission distribution");
+figure;
+scatter3(atomPos(1,:),atomPos(2,:),Dphase,'filled');
+title("Phase distribution");
 
 
 % Calculating the field and plot it out.(real, imag, and abs)
