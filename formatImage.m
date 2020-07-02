@@ -1,14 +1,19 @@
 clear all;
-fname = 'f_47.fig';
-folder_path = 'D:/Dropbox/Thesis/MATLAB/';
+fname = 'axicon_10.fig';
+folder_path = 'D:/GoogleDrive/Thesis/MATLAB/';
 fig = [folder_path,fname];
 inf = openfig(fig);
+
 C = gca;
+
+%truesize(figure(1),[500,1500]);
 title('');
 xlabel('Distance (\mum)');
+xticks([0,100,200,300,400,500]);
 ylabel('x (\mum)');
-yticks([-30,-15,0,15,30]);
+yticks([-50,-25,0,25,50]);
 set(C,'FontSize',20);
-text(C,325,40,'f = 47\mum','FontSize',36,'FontWeight','bold','color','w');
+set(figure(1),'position',[342,438,1400,400]);
+text(C,400,40,['\beta = 10',char(176)],'FontSize',36,'FontWeight','bold','color','w');
 savefig([folder_path,fname]);
-saveas(gcf,[folder_path,'f_47.png']);
+saveas(gcf,[folder_path,'axicon_10.png']);

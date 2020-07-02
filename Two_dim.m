@@ -49,7 +49,7 @@ f_num = 3.5; % f-number
 f = input.f; % focal length
 gt_angle = input.gt_angle; % grating angle
 center=input.center; % middle point of the pattern
-beta =5; % beta angle of axicon(in degree)
+beta =input.beta; % beta angle of axicon(in degree)
 neff = 2.858; % effective index derived from FDTD
 wavelength = 1.55;
 phase_delay=input.phase_delay;
@@ -154,7 +154,7 @@ else
 end
 % Do the interpolation to find the corresponding radius and transmission data.
 [R_list,T_list]=Interpolation(Dphase,Phase,T,R_range);
-T_list = ones(1,length(atomPos));
+
 
 
 % Output radius list
@@ -192,12 +192,13 @@ title("Phase distribution");
 
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_focusingField==true
-   focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
+    focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
         x_range,z_range,0,x_res,z_res,wavelength,false);
-    
+
+    [a,b]=max(max(abs(focusing_field(:,100:end))));
+    focal_z = z_range(1)+(b+100)*(z_range(2)-z_range(1))/z_res;
 end
-[a,b]=max(max(abs(focusing_field(:,100:end))));
-focal_z = z_range(1)+(b+100)*(z_range(2)-z_range(1))/z_res;
+
 
 if plot_focalField==true
     focal_field=Focal_Slice(Dphase,T_list,atomPos,...
