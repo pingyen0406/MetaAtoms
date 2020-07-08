@@ -1,7 +1,7 @@
 # Simulating metalens as the superposition of the point source
-This method takes every meta-atom as an independent point source and superpose them together (superposition of scalar field)
+This method takes every meta-atom as an independent point source(electric field of spherical wave)  and adds them together (superposition of scalar field).
 ## Input data 
-The input data should have radius-transmission and radius-phase relations. 
+The input data should have radii-transmission and radii-phase relations. 
 
 ## Processing flow
 1. Read the input json file
