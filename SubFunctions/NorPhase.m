@@ -6,7 +6,7 @@ function Phase = NorPhase(Phase)
 % Output: Normalized phase between [-1,0]. The first one starts from -1 and
 % ascends.
 % Normalize the phase 
-if max(max(Phase))>1 | min(min(Phase))<-1
+if max(max(Phase))>1 || min(min(Phase))<-1
     Phase=Phase/2/pi;
 end
 % Find the relative value

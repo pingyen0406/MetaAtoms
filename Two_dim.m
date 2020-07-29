@@ -29,16 +29,16 @@ fname_Phase = [folder_path,'SweepPhase562.txt'];
 plot_focalField = input.plot_focalField;
 plot_focusingField = input.plot_focusingField;
 outputlist = input.outputlist;
-outputname = [input.output_path,'grating_27.txt'];
+outputname = [input.output_path,input.output_name];
 
 % Read data from S4 calculation
 % (i,j) is 500+10*i nm height and 100+1*j nm radius
 all_T = readmatrix(fname_T);
 all_Phase = readmatrix(fname_Phase);
-height = 1200;
-T = all_T(height/10-50+1,:);
-Phase = all_Phase(height/10-50+1,:);
-R_range = [0.03:0.002:0.248];
+height = input.height;
+T = all_T(height/0.01-50+1,:);
+Phase = all_Phase(height/0.01-50+1,:);
+R_range = [0.05:0.002:0.248];
 
 % Parameters
 period = input.period;
@@ -50,7 +50,7 @@ f = input.f; % focal length
 gt_angle = input.gt_angle; % grating angle
 center=input.center; % middle point of the pattern
 beta =input.beta; % beta angle of axicon(in degree)
-neff = 2.858; % effective index derived from FDTD
+neff = input.neff; % effective index derived from FDTD
 wavelength = 1.55;
 phase_delay=input.phase_delay;
 decay = input.dacay;
@@ -66,39 +66,27 @@ z_res = input.z_res;
 atomPos = squarePos("square",[0,0],period,size);
 N = sqrt(length(atomPos));
 diff = [ones(1,N*N)*N*period;zeros(1,N*N)];
-% Use 3 squares to create a rectangle
-atomPos = cat(2,atomPos-diff,atomPos,atomPos+diff);
+% Use 3 squares to create a rectangle(20um*60um lens)
+%atomPos = cat(2,atomPos-diff,atomPos,atomPos+diff);
 
-%---------------------------- Test data-----------------------------------
-%{
-tic;
-test_name = 'perfectAtom.txt';
-test_f = readmatrix(test_name);
-test_r = transpose(test_f(:,1));
-test_T = transpose(test_f(:,2));
-test_Phase = NorPhase(transpose(test_f(:,3)));
-test_Phase(1,end)=0;
-Dphase = SphericalOutput(0,test_Phase,f,center,atomPos,1.55);
-[R_list,T_list]=Interpolation(Dphase,test_Phase,test_T,test_r);
-focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
-        x_range,z_range,0,x_res,z_res,1.55,true);
-focal_field=Focal_Slice(Dphase,T_list,atomPos,...
-    x_range,y_range,f,x_res,y_res,1.55,true); 
-toc;
-%}
-%--------------------------------------------------------------------------
 
 
 
 % Normalize the input phase data
 Phase=NorPhase(Phase);
-% Set an breakpoint this line to check the phase data.
+%%%%%%%%%%%% Set an breakpoint this line to check the phase data. %%%%%%%%%
 % Truncate the phase data at desired interval
-start_index=35;
-stop_index=79;
+start_index=26;
+stop_index=73;
 Phase = Truncated_Phase(Phase,start_index,stop_index);
 T = T(1,start_index:stop_index);
 R_range = R_range(1,start_index:stop_index);
+[maxT,maxT_index] = max(T);
+T_index = find(T>0.4*maxT);
+Phase = NorPhase(circshift(Phase,length(T)-T_index(1)));
+T = circshift(T,length(T)-T_index(1));
+R_range = circshift(R_range,length(T)-T_index(1));
+
 
 % Taking propagation phase into consideration
 % Subtracting the phase due to propagation(equivalent to a plane wave under
@@ -215,6 +203,26 @@ end
 
 toc; %timer stop
 
+%% ---------------------------- Airy disk-----------------------------------
+%{
+test_name = 'perfectAtom.txt';
+test_f = readmatrix(test_name);
+test_r = transpose(test_f(:,1));
+test_T = transpose(test_f(:,2));
+test_Phase = NorPhase(transpose(test_f(:,3)));
+test_Phase(1,end)=0;
+airy_Dphase = SphericalOutput(0,test_Phase,f,center,atomPos,1.55);
+[R_list,T_list]=Interpolation(airy_Dphase,test_Phase,test_T,test_r);
+%airy_focusing_field=Focusing_Slice(airy_Dphase,T_list,atomPos,...
+%        x_range,z_range,0,x_res,z_res,wavelength,true);
+airy_focal_field=Focal_Slice(airy_Dphase,T_list,atomPos,...
+    x_range,y_range,focal_z,x_res,y_res,wavelength,false); 
+
+%--------------------------------------------------------------------------
+x_axis= linspace(x_range(1),x_range(2),x_res);
+plot(x_axis,normalize(abs(focusing_field(:,b+100)),'range'),...
+    x_axis,normalize(abs(airy_focal_field(250,:)),'range'),'--');
+%}
 
 
 
