@@ -63,7 +63,7 @@ z_range = input.z_range;
 z_res = input.z_res;
 
 %atomPos = squarePos("circle",[0,0],period,size/2);
-atomPos = squarePos("square",[0,0],period,size);
+[atomPos_X,atomPos_Y] = squarePos("square",[0,0],period,size);
 N = sqrt(length(atomPos));
 diff = [ones(1,N*N)*N*period;zeros(1,N*N)];
 % Use 3 squares to create a rectangle(20um*60um lens)

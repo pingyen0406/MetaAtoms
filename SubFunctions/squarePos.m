@@ -1,4 +1,4 @@
-function atomPos = squarePos(type,midPoint,period,size)
+function [atomPos_X,atomPos_Y] = squarePos(type,midPoint,period,size)
 % Generating x,y position of square lattice at given period and size.
 % Input:
 % type: Define shape of the lens. Can be either"circle" or "rect".
@@ -31,26 +31,15 @@ if type=="circle"
     end
     
 elseif type=="square"
-    N = floor(size/period)+1;
+    Nx = floor(size(1)/period)+1;
+    Ny = floor(size(2)/period)+1;
     % Create a quarter of the lens
-    for i=1:floor(N/2)
-        for j=1:floor(N/2)
-            x_now = period*i;
-            y_now = period*j;
-            atomPos=cat(2,atomPos,[x_now;y_now]);     
-        end
-    end
-    % Check it's even or odd and use the corresponding method       
-    if mod(N,2)~=0
-        atomPos = oddOperation(atomPos,floor(N/2),period);    
-    else
-        atomPos = evenOperation(atomPos,period);
-    end        
+    pos_x = -period*(Nx-1)/2:period:period*(Nx-1)/2;
+    pos_y = -period*(Ny-1)/2:period:period*(Ny-1)/2;
+    [atomPos_X,atomPos_Y] = meshgrid(pos_x+midPoint(1),pos_y+midPoint(2));
 else
     error('Wrong input shape');
 end
-atomPos = atomPos+[midPoint(1);midPoint(2)];
-atomPos = sortrows(atomPos')';
 
 end
 
