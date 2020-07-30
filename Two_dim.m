@@ -43,7 +43,7 @@ R_range = [0.05:0.002:0.248];
 % Parameters
 period = input.period;
 lens_type = input.lens_type; % "axicon" or "spherical"
-size = input.size;
+lens_size = input.size;
 % 'Radius' or 'Length' of metalens (circle or square)
 f_num = 3.5; % f-number
 f = input.f; % focal length
@@ -63,9 +63,11 @@ z_range = input.z_range;
 z_res = input.z_res;
 
 %atomPos = squarePos("circle",[0,0],period,size/2);
-[atomPos_X,atomPos_Y] = squarePos("square",[0,0],period,size);
-N = sqrt(length(atomPos));
-diff = [ones(1,N*N)*N*period;zeros(1,N*N)];
+[atomPos_X,atomPos_Y] = squarePos("square",[0,0],period,lens_size);
+size_array = size(atomPos_X);
+
+
+%diff = [ones(1,N*N)*N*period;zeros(1,N*N)];
 % Use 3 squares to create a rectangle(20um*60um lens)
 %atomPos = cat(2,atomPos-diff,atomPos,atomPos+diff);
 
@@ -92,16 +94,9 @@ R_range = circshift(R_range,length(T)-T_index(1));
 % Subtracting the phase due to propagation(equivalent to a plane wave under
 % the meta-atoms)
 if phase_delay==true
-    count=1;
-    delay_phase = zeros(1,length(atomPos));
-    prop_N = length(atomPos)/N;
-    tmp_delay_phase = PropCorrect(prop_N,period,neff,wavelength); 
-    tmp_delay_phase = NorPhase(tmp_delay_phase);
-    for i=1:prop_N
-        for j=1:N
-            delay_phase(1,count)=tmp_delay_phase(1,i);
-            count=count+1;
-        end
+    delay_phase = zeros(size_array);
+    for i=1:size_array(2)
+        delay_phase(:,i) = -(i-1)*period*neff/wavelength;
     end
 else
     delay_phase=0;
@@ -127,54 +122,42 @@ for center=[[-30;0],[-10;0],[10;0],[30;0]]
     count=count+1;
 end
 %}
-    
+
 % Create the desired phase profile
 if lens_type=="axicon"
-    Dphase = axiconOutput(delay_phase,Phase,beta,center,atomPos,1.55);
+    Dphase = axiconOutput(delay_phase,Phase,beta,center,atomPos_X,atomPos_Y,1.55);
 elseif lens_type=="spherical"
-    Dphase = SphericalOutput(delay_phase,Phase,f,center,atomPos,1.55);
+    Dphase = SphericalOutput(delay_phase,Phase,f,center,atomPos_X,atomPos_Y,1.55);
 elseif lens_type=="grating"
-    Dphase = gratingOutput(delay_phase,Phase,gt_angle,period,neff,atomPos,1.55);
+    Dphase = gratingOutput(delay_phase,Phase,gt_angle,period,neff,atomPos_X,atomPos_Y,1.55);
 elseif lens_type=="None"
     Dphase = zeros(1,length(atomPos));
 else
     error("Wrong lens type");
 end
 % Do the interpolation to find the corresponding radius and transmission data.
-[R_list,T_list]=Interpolation(Dphase,Phase,T,R_range);
+[R_list,T_list]=findSize(Dphase,Phase,T,R_range);
 
 
 
 % Output radius list
-if outputlist==true 
-    outf = fopen(outputname,'w');
-    for i=1:length(R_list)
-        fprintf(outf,'%f\n',R_list(i));
-    end
-    fclose(outf);
+if outputlist==true
+    writematrix(R_list,outputname,'Delimiter','tab')
 end
 
 % Simulating energy decay below the waveguide
 if decay==true
-    N_l = length(atomPos)/N;
-    count=1;
-    for i=1:N_l
-        for j=1:N
-            T_list(1,count)=(1-decay_rate*(i-1)/N_l)*T_list(1,count);
-            count=count+1;
-        end
-        if count>N_l*N
-            break
-        end
+    for i=1:size_array(2)
+        T_list(i,:) = T_list(i,:)*exp(log(decay_rate)/lens_size(1)*i*period);
     end
 end
 
 % Check the Radius and Transmission distribution
 figure;
-scatter3(atomPos(1,:),atomPos(2,:),T_list,'filled');
+surf(atomPos_X,atomPos_Y,T_list);
 title("Transmission distribution");
 figure;
-scatter3(atomPos(1,:),atomPos(2,:),Dphase,'filled');
+surf(atomPos_X,atomPos_Y,Dphase);
 title("Phase distribution");
 
 
