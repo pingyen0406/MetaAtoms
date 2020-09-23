@@ -1,4 +1,4 @@
-function Dphase=SphericalOutput(init_phase,phase,f,mid_point,atomPos_X,atomPos_Y,lambda)
+function Dphase=SphericalOutput(init_phase,phi0,f,mid_point,atomPos_X,atomPos_Y,lambda)
 % This function generates a phase list of meta-atoms that can focus the beam.
 % Unit in "micron".
 % Phase profile: -(2pi/lambda)*(sqrt(r^2+f^2)-f)
@@ -26,7 +26,7 @@ x=mid_point(1);
 y=mid_point(2);
 lens_size = size(atomPos_X);
 r_square = (atomPos_X-x).^2+(atomPos_Y-y).^2;
-Dphase = Dphase-(sqrt(r_square+f^2)-f)/lambda;
+Dphase = Dphase-(sqrt(r_square+f^2)-f)/lambda+phi0;
 for i=1:lens_size(1)
     for j=1:lens_size(2)
         while Dphase(i,j)<-1

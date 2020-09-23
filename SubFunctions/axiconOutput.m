@@ -1,4 +1,4 @@
-function Dphase=axiconOutput(init_phase,phase,beta,mid_point,atomPos_X,atomPos_Y,lambda)
+function Dphase=axiconOutput(init_phase,phi0,beta,mid_point,atomPos_X,atomPos_Y,lambda)
 % This function generates a phase list of meta-atoms that acts like an axion.
 % Unit in "micron".
 % Phase profile: -(2pi/lambda)*(sqrt(r^2+f^2)-f)
@@ -26,7 +26,7 @@ lens_size = size(atomPos_X);
 x0=mid_point(1);
 y0=mid_point(2);
 r_square = (atomPos_X-x0).^2+(atomPos_Y-y0).^2;
-Dphase = Dphase-sqrt(r_square)*sin(beta)/lambda;
+Dphase = Dphase-sqrt(r_square)*sin(beta)/lambda+phi0;
 for i=1:lens_size(1)
     for j=1:lens_size(2)
         while Dphase(i,j)<-1

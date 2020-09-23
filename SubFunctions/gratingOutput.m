@@ -1,4 +1,4 @@
-function Dphase = gratingOutput(init_phase,phase,angle,period,neff,atomPos_X,atomPos_y,lambda)
+function Dphase = gratingOutput(init_phase,phi0,angle,period,atomPos_X,atomPos_y,lambda)
 % This function generates a phase list of meta-atoms that acts like an
 % grating coupler.
 % Unit in "micron".
@@ -23,7 +23,7 @@ end
 lens_size = size(atomPos_X);
 
 for i=1:lens_size(2)
-    Dphase(:,i) = Dphase(:,i)+i*period*sin(deg2rad(angle))/lambda+1;
+    Dphase(:,i) = Dphase(:,i)+i*period*sin(deg2rad(angle))/lambda+1+phi0;
 
 end
 for i=1:lens_size(1)

@@ -54,18 +54,18 @@ neff = input.neff; % effective index derived from FDTD
 wavelength = 1.55;
 phase_delay=input.phase_delay;
 decay = input.dacay;
-decay_rate = 0.5;
-x_range = input.x_range;
-x_res = input.x_res;
-y_range = input.y_range;
-y_res = input.y_res;
-z_range = input.z_range;
-z_res = input.z_res;
+decay_rate = 0.5; % The ramaining power in the waveguide. 
+
+
+
+phi0 = 0.3; 
+% phase shift between [0,1], you can modify this to have a better intensity
+% distribution.
+
 
 %atomPos = squarePos("circle",[0,0],period,size/2);
 [atomPos_X,atomPos_Y] = squarePos("square",[0,0],period,lens_size);
 size_array = size(atomPos_X);
-
 
 %diff = [ones(1,N*N)*N*period;zeros(1,N*N)];
 % Use 3 squares to create a rectangle(20um*60um lens)
@@ -83,12 +83,6 @@ stop_index=73;
 Phase = Truncated_Phase(Phase,start_index,stop_index);
 T = T(1,start_index:stop_index);
 R_range = R_range(1,start_index:stop_index);
-[maxT,maxT_index] = max(T);
-T_index = find(T>0.4*maxT);
-Phase = NorPhase(circshift(Phase,length(T)-T_index(1)));
-T = circshift(T,length(T)-T_index(1));
-R_range = circshift(R_range,length(T)-T_index(1));
-
 
 % Taking propagation phase into consideration
 % Subtracting the phase due to propagation(equivalent to a plane wave under
@@ -102,42 +96,26 @@ else
     delay_phase=0;
 end
 
-
 tic; % timer start
 
-% Output multiple R_list at a time
-%{
-count=1;
-for center=[[-30;0],[-10;0],[10;0],[30;0]]
-    outputname = [folder_path,'focus_180_',num2str(count),'.txt'];
-    Dphase = SphericalOutput(delay_phase,Phase,f,center,atomPos,1.55);
-% Do interpolation to find the corresponding radius and transmission data.
-    [R_list,T_list]=Interpolation(Dphase,Phase,T,R_range);
-    
-    outf = fopen(outputname,'w');
-    for i=1:length(R_list)
-        fprintf(outf,'%f\n',R_list(i));
-    end
-    fclose(outf);
-    count=count+1;
-end
-%}
 
 % Create the desired phase profile
 if lens_type=="axicon"
-    Dphase = axiconOutput(delay_phase,Phase,beta,center,atomPos_X,atomPos_Y,1.55);
+    Dphase = axiconOutput(delay_phase,phi0,beta,center,atomPos_X,atomPos_Y,1.55);
 elseif lens_type=="spherical"
-    Dphase = SphericalOutput(delay_phase,Phase,f,center,atomPos_X,atomPos_Y,1.55);
+    Dphase = SphericalOutput(delay_phase,phi0,f,center,atomPos_X,atomPos_Y,1.55);
 elseif lens_type=="grating"
-    Dphase = gratingOutput(delay_phase,Phase,gt_angle,period,neff,atomPos_X,atomPos_Y,1.55);
+    Dphase = gratingOutput(delay_phase,phi0,gt_angle,period,atomPos_X,atomPos_Y,1.55);
 elseif lens_type=="None"
     Dphase = zeros(1,length(atomPos));
 else
     error("Wrong lens type");
 end
+%Dphase2 = SphericalOutput(delay_phase2,phi0,f,[0,0],atomPos_X2,atomPos_Y2,1.55);
+
 % Do the interpolation to find the corresponding radius and transmission data.
 [R_list,T_list]=findSize(Dphase,Phase,T,R_range);
-
+%[R_list2,T_list2]=findSize(Dphase2,Phase,T,R_range);
 
 
 % Output radius list
@@ -146,21 +124,35 @@ if outputlist==true
 end
 
 % Simulating energy decay below the waveguide
+% base on exp(-alpha*x)
 if decay==true
     for i=1:size_array(2)
-        T_list(i,:) = T_list(i,:)*exp(log(decay_rate)/lens_size(1)*i*period);
+        T_list(:,i) = T_list(:,i)*exp(log(decay_rate)/lens_size(1)*i*period);
     end
 end
-
+%T_list = T_list/max(max(T_list));
+Phase_dist = Dphase+1;
 % Check the Radius and Transmission distribution
 figure;
-surf(atomPos_X,atomPos_Y,T_list);
-title("Transmission distribution");
+surface(atomPos_X,atomPos_Y,T_list);
+title("Top emission intensity distribution");
+
 figure;
-surf(atomPos_X,atomPos_Y,Dphase);
+surface(atomPos_X,atomPos_Y,Phase_dist);
 title("Phase distribution");
 
 
+% Stop here if you only want to find the corresponding radii list of the
+% designed phase profile.
+
+%% Use superposition of the point source to estimate the result
+
+x_range = input.x_range;
+x_res = input.x_res;
+y_range = input.y_range;
+y_res = input.y_res;
+z_range = input.z_range;
+z_res = input.z_res;
 % Calculating the field and plot it out.(real, imag, and abs)
 if plot_focusingField==true
     focusing_field=Focusing_Slice(Dphase,T_list,atomPos,...
@@ -186,26 +178,7 @@ end
 
 toc; %timer stop
 
-%% ---------------------------- Airy disk-----------------------------------
-%{
-test_name = 'perfectAtom.txt';
-test_f = readmatrix(test_name);
-test_r = transpose(test_f(:,1));
-test_T = transpose(test_f(:,2));
-test_Phase = NorPhase(transpose(test_f(:,3)));
-test_Phase(1,end)=0;
-airy_Dphase = SphericalOutput(0,test_Phase,f,center,atomPos,1.55);
-[R_list,T_list]=Interpolation(airy_Dphase,test_Phase,test_T,test_r);
-%airy_focusing_field=Focusing_Slice(airy_Dphase,T_list,atomPos,...
-%        x_range,z_range,0,x_res,z_res,wavelength,true);
-airy_focal_field=Focal_Slice(airy_Dphase,T_list,atomPos,...
-    x_range,y_range,focal_z,x_res,y_res,wavelength,false); 
 
-%--------------------------------------------------------------------------
-x_axis= linspace(x_range(1),x_range(2),x_res);
-plot(x_axis,normalize(abs(focusing_field(:,b+100)),'range'),...
-    x_axis,normalize(abs(airy_focal_field(250,:)),'range'),'--');
-%}
 
 
 

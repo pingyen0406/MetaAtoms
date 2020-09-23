@@ -1,4 +1,4 @@
-function field_matrix = pointSource_field(Phase,T,atomPos,interval_1,...
+function field_matrix = pointSource_field(Phase,T,atomPos_X,atomPos_Y,interval_1,...
     interval_2,slicePoint,lambda,type)
 % Calaulating the 2D field slice which emitted from meta-atoms at given position.
 % Unit in "micron".
@@ -15,7 +15,7 @@ function field_matrix = pointSource_field(Phase,T,atomPos,interval_1,...
 % field_matrix: scalar value on given intervals
 % type: 'focal' or 'focusing' plane. The distance term has slight
 % difference.
-tmpField=zeros(1,length(atomPos));
+tmpField=zeros(size(atomPos_X));
 field_matrix = zeros(length(interval_1),length(interval_2));
 if type == "focal"
     for i= 1:length(interval_1)
