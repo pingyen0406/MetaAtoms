@@ -26,7 +26,7 @@ lens_size = size(atomPos_X);
 x0=mid_point(1);
 y0=mid_point(2);
 r_square = (atomPos_X-x0).^2+(atomPos_Y-y0).^2;
-Dphase = Dphase-sqrt(r_square)*sin(beta)/lambda+phi0;
+Dphase = -Dphase-sqrt(r_square)*sin(beta)/lambda+phi0;
 for i=1:lens_size(1)
     for j=1:lens_size(2)
         while Dphase(i,j)<-1

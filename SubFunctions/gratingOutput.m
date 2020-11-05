@@ -18,7 +18,7 @@ function Dphase = gratingOutput(init_phase,phi0,angle,period,atomPos_X,atomPos_y
 if init_phase==0
     Dphase = zeros(1,length(atom_pos));
 else
-    Dphase = init_phase;
+    Dphase = -init_phase;
 end
 lens_size = size(atomPos_X);
 

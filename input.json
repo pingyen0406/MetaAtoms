@@ -1,18 +1,24 @@
 {
-    "folder_path":"D:/GoogleDrive/MATLAB/MetaAtoms/Lib562/80nmSiO2/newRun/2ndRun/",
+    "folder_path":"D:/GoogleDrive/MATLAB/MetaAtoms/Lib562/80nmSiO2/2ndRun/",
+    "inputName_T": "SweepT562.txt",
+    "inputName_Phase": "SweepPhase562.txt",
     "plot_focalField" : false,
     "plot_focusingField" : false,
-    "outputlist": false,
+    "outputlist": true,
     "output_path": "D:/GoogleDrive/MATLAB/MetaAtoms/",
-    "output_name": "80nmSiO2_f_300_Full.txt",
+    "output_name": "80nmSiO2_f_100_full.txt",
     "period": 0.562,
     "height": 1.2,
-    "lens_type": "spherical",
+    "lens_spec": [
+      {
+        "lens_type": "spherical",
+        "f": 100,
+        "gt_angle": 27,
+        "beta": 1
+      }
+    ],
     "size": [60,20],
-    "neff": 2.8434,
-    "f": 100,
-    "gt_angle": 27,
-    "beta": 1,
+    "neff": 2.8535,
     "center":[0,0],
     "dacay": false,
     "phase_delay": true,

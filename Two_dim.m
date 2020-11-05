@@ -24,8 +24,8 @@ input=jsondecode(fileread('input.json'));
 folder_path = input.folder_path;
 current_fol = pwd;
 addpath([current_fol,'\','SubFunctions\']);
-fname_T = [folder_path,'SweepT562.txt'];
-fname_Phase = [folder_path,'SweepPhase562.txt'];
+fname_T = [folder_path,input.inputName_T];
+fname_Phase = [folder_path,input.inputName_Phase];
 plot_focalField = input.plot_focalField;
 plot_focusingField = input.plot_focusingField;
 outputlist = input.outputlist;
@@ -38,45 +38,56 @@ all_Phase = readmatrix(fname_Phase);
 height = input.height;
 T = all_T(height/0.01-50+1,:);
 Phase = all_Phase(height/0.01-50+1,:);
-R_range = [0.05:0.002:0.248];
+R_range = [0.05:0.002:0.348];
 
 % Parameters
 period = input.period;
-lens_type = input.lens_type; % "axicon" or "spherical"
+lens_type = input.lens_spec.lens_type; % "axicon" or "spherical"
 lens_size = input.size;
 % 'Radius' or 'Length' of metalens (circle or square)
 f_num = 3.5; % f-number
-f = input.f; % focal length
-gt_angle = input.gt_angle; % grating angle
+f = input.lens_spec.f; % focal length
+gt_angle = input.lens_spec.gt_angle; % grating angle
 center=input.center; % middle point of the pattern
-beta =input.beta; % beta angle of axicon(in degree)
+beta =input.lens_spec.beta; % beta angle of axicon(in degree)
 neff = input.neff; % effective index derived from FDTD
 wavelength = 1.55;
 phase_delay=input.phase_delay;
 decay = input.dacay;
 decay_rate = 0.5; % The ramaining power in the waveguide. 
 
-
-
-phi0 = 0.3; 
 % phase shift between [0,1], you can modify this to have a better intensity
 % distribution.
+phi0 = 0.4; 
 
-
-%atomPos = squarePos("circle",[0,0],period,size/2);
-[atomPos_X,atomPos_Y] = squarePos("square",[0,0],period,lens_size);
+[atomPos_X,atomPos_Y] = squarePos([0,0],period,lens_size);
 size_array = size(atomPos_X);
 
 %diff = [ones(1,N*N)*N*period;zeros(1,N*N)];
 % Use 3 squares to create a rectangle(20um*60um lens)
 %atomPos = cat(2,atomPos-diff,atomPos,atomPos+diff);
 
-
+% Phase due to propgation
+if phase_delay==true
+    delay_phase = zeros(size_array);
+    for i=1:size_array(2)
+        delay_phase(:,i) = neff*(i-1)*period/wavelength;
+    end
+elseif phase_delay==false
+        phase_delay=0;
+else
+    error("Wrong input");
+end
 
 
 % Normalize the input phase data
 Phase=NorPhase(Phase);
-%%%%%%%%%%%% Set an breakpoint this line to check the phase data. %%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                         %
+%      Set an breakpoint this line to check the phase data.               %
+%                                                                         %  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % Truncate the phase data at desired interval
 start_index=26;
 stop_index=73;
@@ -87,15 +98,6 @@ R_range = R_range(1,start_index:stop_index);
 % Taking propagation phase into consideration
 % Subtracting the phase due to propagation(equivalent to a plane wave under
 % the meta-atoms)
-if phase_delay==true
-    delay_phase = zeros(size_array);
-    for i=1:size_array(2)
-        delay_phase(:,i) = -(i-1)*period*neff/wavelength;
-    end
-else
-    delay_phase=0;
-end
-
 tic; % timer start
 
 
