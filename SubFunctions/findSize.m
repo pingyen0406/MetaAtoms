@@ -1,4 +1,4 @@
-function [R_list, T_list] = findSize(Dphase,Phase,T,R)
+function [R_list, T_list, Phase_list] = findSize(Dphase,Phase,T,R)
 % Find the corresponding radius and transmission of the meta-atoms by 
 % interpolation.
 % Find the radius list first and then use the radius list to do
@@ -13,10 +13,12 @@ function [R_list, T_list] = findSize(Dphase,Phase,T,R)
 % T_list: transmission list comes from designed radius list.
 lensSize = size(Dphase);
 R_list = zeros(size(Dphase));
+Phase_list = Dphase;
 for i =1:lensSize(1)
     for j=1:lensSize(2)
         if isnan(interp1(Phase,R,Dphase(i,j)))==true
             R_list(i,j)=0;
+            Phase_list(i,j)=0;
         else
             R_list(i,j) = interp1(Phase,R,Dphase(i,j));
         end

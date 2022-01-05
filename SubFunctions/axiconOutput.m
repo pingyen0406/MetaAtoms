@@ -8,12 +8,12 @@ function Dphase=axiconOutput(init_phase,phi0,beta,mid_point,atomPos_X,atomPos_Y,
 %         If there is no initial phase data, just input '0'.
 % phase = phase data, which is used to avoid empty region in the middle part.
 % beta = beta of axicon (degree)
+% f = focal length(um)
 % mid_point = projection of the focal point on the xy-plane.
-% atom_pos = position of each atom. Should be 2D array.(um)
+% atomPos_X & atomPos_Y = position of each atom. Should be 2D array.(meshgrid)
 % lambda = wavelength(um)
 % Output
-% list: radius list of spherical phase profile
-% Dphase: corresponding phase array(Normalized, starting from -1)
+% Dphase: Phase data on the x-y grids(Normalized, starting from -1)
 % 
 beta = beta*pi/180;
 % Check if there are propagation angle need to be considered
