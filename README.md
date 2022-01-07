@@ -1,5 +1,5 @@
 # Generating radius matrix of desired metalens phase profile
-This method takes every meta-atom as an independent point source(electric field of spherical wave)  and adds them together (superposition of scalar field).
+Choose desired phase profile and find corresponding radius of the meta-atom.
 ## Prerequisites 
 The input data should have radii-transmission and radii-phase relations. You can use RCWA, FDTD,...etc to calculate the relation.
 
