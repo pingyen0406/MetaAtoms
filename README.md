@@ -1,12 +1,14 @@
-# Simulating metalens as the superposition of the point source
+# Generating radius matrix of desired metalens phase profile
 This method takes every meta-atom as an independent point source(electric field of spherical wave)  and adds them together (superposition of scalar field).
-## Input data 
-The input data should have radii-transmission and radii-phase relations. 
+## Prerequisites 
+The input data should have radii-transmission and radii-phase relations. You can use RCWA, FDTD,...etc to calculate the relation.
 
 ## Processing flow
-1. Read the input json file
-2. Creat a 2xN matrix which contains the position of every meta-atom
-3. Do massage to the input data and create the library radius, transmission and phase
-4. Generate the designed phase profile and use interpolation to put corresponding meta-atom to each position
-5. Calculate the field by the transmission and initial phase data and plot it out
-One_dim.m and Two_dim.m are 1-D and 2-D examples
+1. Setting parameters in the input.json(transmission & phase data, lens
+size, radius & height range and step)
+2. For the 1st run, set a breakpoint at line 60. You need to choose the
+range of the radii.
+3. After determining the radii range, just follow the pop out dialog.
+Note that if you choose "custom", the input desired phase matrix should
+have value between 0 to 2pi.
+
