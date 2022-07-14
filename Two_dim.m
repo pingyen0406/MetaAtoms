@@ -18,7 +18,7 @@ input=jsondecode(fileread('input.json'));
 % Windows path
 folder_path = input.folder_path;
 current_fol = pwd;
-addpath([current_fol,'\','SubFunctions\']);
+addpath([current_fol,'/SubFunctions/']);
 fname_T = [folder_path,input.inputName_T];
 fname_Phase = [folder_path,input.inputName_Phase];
 plot_focalField = input.plot_focalField;
@@ -66,7 +66,7 @@ Phase=NorPhase(Phase,true);
 %plot(R_range,Phase);
 % Truncate the phase data at desired interval
 start_index=26;
-stop_index=73;
+stop_index=76;
 Phase = Truncated_Phase(Phase,start_index,stop_index);
 T = T(1,start_index:stop_index);
 R_range = R_range(1,start_index:stop_index);
@@ -88,7 +88,7 @@ end
 tic; % timer start
 
 % Pop out dialog to choose lens type
-lensTypes = {'axicon','spherical','custom','none'};
+lensTypes = {'spherical','custom','axicon','none'};
 [indx,~] = listdlg('PromptString','Select a type of lens.',...
     'SelectionMode','single','ListString',lensTypes);
 lens_type=lensTypes(indx);
@@ -182,7 +182,8 @@ surface(atomPos_X,atomPos_Y,T_list);
 title("Top emission intensity distribution");
 
 figure;
-surface(atomPos_X,atomPos_Y,Phase_dist);
+s1 = surface(atomPos_X,atomPos_Y,Phase_dist);
+s1.EdgeColor = 'none';
 title("Phase distribution");
 colormap('jet');
 figure;
