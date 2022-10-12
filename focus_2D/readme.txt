@@ -1,0 +1,1 @@
+Meta-atom radius distributions of 60 um by 20 um metasurface with period of 562 nm.
