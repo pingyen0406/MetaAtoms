@@ -12,3 +12,11 @@ range of the radii.
 Note that if you choose "custom", the input desired phase matrix should
 have values between 0 to 2pi.
 
+## Relevent Publications
+Integrated Metasurfaces on Silicon Photonics for Emission Shaping and Holographic Projection [arxiv](https://arxiv.org/abs/2205.10537)  
+Ping-Yen Hsieh, Shun-Lin Fang, Yu-Siang Lin, Wen-Hsien Huang, Jia-Min Shieh, Peichen Yu, and You-Chia Chang  
+Nanophotonics (Accepted, 2022)  
+
+[Shaping Free-space Emission with Monolithically Integrated Metalenses on Silicon Photonic Waveguides](https://doi.org/10.1364/CLEO_SI.2022.SM4P.7)  
+Ping-Yen Hsieh, Yu-Siang Lin, Shun-Lin Fang, and You-Chia Chang  
+CLEO 2022: Science and Innovations, SM4P.7  
