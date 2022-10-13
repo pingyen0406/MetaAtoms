@@ -13,7 +13,7 @@ Note that if you choose "custom", the input desired phase matrix should
 have values between 0 to 2pi.
 
 ## Relevent Publications
-Integrated Metasurfaces on Silicon Photonics for Emission Shaping and Holographic Projection [arxiv](https://arxiv.org/abs/2205.10537)  
+[Integrated Metasurfaces on Silicon Photonics for Emission Shaping and Holographic Projection](https://arxiv.org/abs/2205.10537)  
 Ping-Yen Hsieh, Shun-Lin Fang, Yu-Siang Lin, Wen-Hsien Huang, Jia-Min Shieh, Peichen Yu, and You-Chia Chang  
 Nanophotonics (Accepted, 2022)  
 
