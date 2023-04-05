@@ -12,7 +12,7 @@ range of the radii.
 Note that if you choose "custom", the input desired phase matrix should
 have values between 0 to 2pi.
 
-## Relevent Publications
+## Relevant Publications
 [Metasurfaces on Silicon Photonic Waveguides for Simultaneous Emission Phase and Amplitude Control](https://doi.org/10.1364/OE.487589)  
 **Ping-Yen Hsieh**, Shun-Lin Fang, Yu-Siang Lin, Wen-Hsien Huang, Jia-Min Shieh, Peichen Yu, and You-Chia Chang  
 *Optics Express* 31, 12487-12496 (2023)
