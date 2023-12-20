@@ -32,8 +32,13 @@ all_Phase = readmatrix(fname_Phase);
 height = input.height;
 rowIndex = (height-input.heightRange(1))/input.heightStep+1;
 T = all_T(rowIndex,:);
-Phase = all_Phase(rowIndex,:);
+Phase = NorPhase(all_Phase(rowIndex,:),true);
 R_range = [input.radiusRange(1):input.radiusStep:input.radiusRange(2)];
+
+%T = readmatrix(fname_T);
+%Phase = readmatrix(fname_Phase)-1;
+%R_range = readmatrix("slot/L_list.txt");
+
 
 % Parameters
 period = input.period;
@@ -41,7 +46,8 @@ lens_size = input.size;
 % 'Radius' or 'Length' of metalens (circle or square)
 center=input.center; % middle point of the pattern
 neff = input.neff; % effective index derived from FDTD
-wavelength = 1.55;
+bg_index = 2.848; % background index
+wavelength = 1.55/bg_index;
 use_prop_phase=input.prop_phase;
 decay = input.dacay;
 decay_rate = 0.5; % The ramaining power in the waveguide. 
@@ -56,19 +62,21 @@ size_array = size(atomPos_X);
 %atomPos = cat(2,atomPos-diff,atomPos,atomPos+diff);
 
 % Normalize the input phase data
-Phase=NorPhase(Phase,true);
+% Phase=NorPhase(Phase,false);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                         %
 %      Set an breakpoint this line to check the phase data.               %
 %                                                                         %  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%plot(R_range,Phase);
+plot(R_range,Phase);
 % Truncate the phase data at desired interval
-start_index=26;
-stop_index=76;
-Phase = Truncated_Phase(Phase,start_index,stop_index);
-T = T(1,start_index:stop_index);
+start_index=1;
+stop_index=26;
+%Phase = Truncated_Phase(Phase,start_index,stop_index);
+T = T(start_index:stop_index);
 R_range = R_range(1,start_index:stop_index);
+Phase = Phase(start_index:stop_index);
+Phase(end) = Phase(end)-1;
 
 
 % Taking propagation phase into consideration
@@ -101,7 +109,7 @@ if lens_type=="axicon"
     beta = inputdlg(prompt,dlgtitle,dims,definput);
     beta = str2double(beta{1});
     phi0 = askPhi0;
-    Dphase = axiconOutput(prop_phase,phi0,beta,center,atomPos_X,atomPos_Y,1.55);
+    Dphase = axiconOutput(prop_phase,phi0,beta,center,atomPos_X,atomPos_Y,wavelength);
 elseif lens_type=="spherical"
     prompt = {'Enter focal length(um):'};
     dlgtitle = 'Input';
@@ -110,7 +118,7 @@ elseif lens_type=="spherical"
     f = inputdlg(prompt,dlgtitle,dims,definput);
     f = str2double(f{1});
     phi0 = askPhi0;
-    Dphase = SphericalOutput(prop_phase,phi0,f,center,atomPos_X,atomPos_Y,1.55);
+    Dphase = SphericalOutput(prop_phase,phi0,f,center,atomPos_X,atomPos_Y,wavelength);
 elseif lens_type=="grating"
     prompt = {'Enter grating angle(degree):'};
     dlgtitle = 'Input';
@@ -119,13 +127,13 @@ elseif lens_type=="grating"
     gt_angle = inputdlg(prompt,dlgtitle,dims,definput);
     gt_angle = str2double(gt_angle{1});
     phi0 = askPhi0;
-    Dphase = gratingOutput(prop_phase,phi0,gt_angle,period,atomPos_X,atomPos_Y,1.55);
+    Dphase = gratingOutput(prop_phase,phi0,gt_angle,period,atomPos_X,atomPos_Y,wavelength);
 elseif lens_type=="custom"
     customText = ['Choose the custom input file. Matrix size = ', num2str(size_array(1)),'x',...
         num2str(size_array(2)),'.'];
     disp(customText);
     [customFile,customPath] = uigetfile('*.txt');
-    hologram = NorPhase(readmatrix([customPath,customFile]),true);
+    hologram = NorPhase(readmatrix([customPath,customFile],'Delimiter',' '),false);
     phi0 = askPhi0;
     Dphase = customOutput(prop_phase,hologram,phi0,atomPos_X,atomPos_Y);
 elseif lens_type=="None"
@@ -140,27 +148,27 @@ end
 [R_list,T_list,Phase_list]=findSize(Dphase,Phase,T,R_range);
 %writematrix(Phase_list,"1D_gt_n20_phase.txt");
 % Calculate the average radius
-all_r=0;
-for i=1:size_array(1)
-    for j=1:size_array(2)
-        all_r = all_r+R_list(i,j);
-    end
-end
-avg_r = all_r/size_array(1)/size_array(2);
-
-for i=1:size_array(1)
-    for j=1:size_array(2)
-        if j==1
-            if R_list(i,j)==0
-                R_list(i,j) = R_list(i-1,j);
-            end
-        else
-            if R_list(i,j)==0
-                R_list(i,j) = R_list(i,j-1);
-            end
-        end
-    end
-end
+% all_r=0;
+% for i=1:size_array(1)
+%     fo    `r j=1:size_array(2)
+%         all_r = all_r+R_list(i,j);
+%     end
+% end
+% avg_r = all_r/size_array(1)/size_array(2);
+% 
+% for i=1:size_array(1)
+%     for j=1:size_array(2)
+%         if j==1
+%             if R_list(i,j)==0
+%                 R_list(i,j) = R_list(i-1,j);
+%             end
+%         else
+%             if R_list(i,j)==0
+%                 R_list(i,j) = R_list(i,j-1);
+%             end
+%         end
+%     end
+% end
 % Output radius list
 if outputlist==true
     writematrix(R_list,outputname,'Delimiter','space');
